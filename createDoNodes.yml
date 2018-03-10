@@ -1,0 +1,47 @@
+- hosts: localhost
+  gather_facts: yes
+  vars:
+    droplets:
+      - name: validator-1
+      - name: validator-2
+  tasks:
+    - name: ensure key exists at DigitalOcean
+      digital_ocean: >
+        state=present
+        command=ssh
+        name="aura experiment key"
+        ssh_pub_key={{ lookup('file', '~/.ssh/do.pub') }}
+      register: my_ssh_key
+
+    - digital_ocean: >
+        name={{ item.name }}
+        state=present
+        command=droplet
+        unique_name=yes
+        size_id=1gb
+        region_id=ams3
+        image_id=ubuntu-17-10-x64
+        ssh_key_ids={{ my_ssh_key.ssh_key.id }}
+      with_items: "{{ droplets }}"
+      register: droplet_details
+
+    - debug:
+        msg: "IP is {{ item.droplet.ip_address }}"
+      with_items: "{{ droplet_details.results }}"
+
+    - name: remove hosts.txt
+      file:
+        state: absent
+        path: ./hosts.txt
+
+    - name: create new hosts.txt
+      lineinfile:
+        path: ./hosts.txt
+        line: "[validator]"
+        create: yes
+
+    - name: add dropet IPs to hosts.txt
+      lineinfile:
+        path: ./hosts.txt
+        line: "{{ item.droplet.ip_address }}"
+      with_items: "{{ droplet_details.results }}"
