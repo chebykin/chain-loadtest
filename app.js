@@ -29,7 +29,9 @@ let master = generate('master');
 
 let chainSpec = JSON.parse(fs.readFileSync("./templates/spec.json"));
 chainSpec.engine.authorityRound.params.validators.list = addresses;
-chainSpec.accounts[master] = "252460800000000000000000000";
+chainSpec.accounts[master] = {
+    balance: "252460800000000000000000000"
+};
 
 fs.writeFileSync(`${dir}/spec.json`, JSON.stringify(chainSpec, null, 2));
 

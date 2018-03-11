@@ -1,0 +1,24 @@
+---
+- name: 'Install python2'
+  raw: sudo apt-get -y install python-simplejson
+
+- name: Create new user
+  user:
+    name: ubuntu
+    shell: /bin/bash
+
+- name: Create .ssh folder
+  file:
+    path: ~ubuntu/.ssh
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: 0700
+
+- name: Upload SSH key
+  copy:
+    src: ~/.ssh/do.pub
+    dest: ~ubuntu/.ssh/authorized_keys
+    owner: ubuntu
+    group: ubuntu
+    mode: 0700

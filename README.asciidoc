@@ -1,0 +1,31 @@
+# AURA Loadtest
+
+## Intro
+
+
+## Installation
+
+To deploy ansible scripts for DigitalOcean `dopy` ansible plugin should be used. The latest version of an initial contributor doesn't support python 3.6, so the `//github.com/dfundingsland/dopy.git` fork was used. To install it use the following command:
+
+[source,shell]
+.Install dopy with python v3.x support
+----
+pip install git+git://github.com/dfundingsland/dopy.git#egg=dopy
+----
+
+## Workflow
+### Pre-ansible steps
+
+* generate private keys for all accounts
+*
+
+## Useful commands
+
+[source,shell]
+.Request DO for available OS images
+----
+curl -X GET "https://api.digitalocean.com/v2/images" -H "Authorization: Bearer $TOKEN" | python -m json.tool
+----
+
+## TODO
+

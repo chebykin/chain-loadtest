@@ -1,0 +1,30 @@
+[parity]
+chain = "{{ home }}/validator/spec.json"
+
+[rpc]
+apis = ["web3", "eth", "parity", "parity_set", "net", "traces", "rpc"]
+processing_threads = {{ processor_count }}
+cors=["all"]
+
+[websockets]
+disable = true
+
+[ipc]
+disable = true
+
+[ui]
+disable = true
+
+[network]
+reserved_peers = "{{ home }}/validator/bootnodes.txt"
+discovery = false
+
+[account]
+password = ["{{ home }}/validator/node.pwd"]
+
+[mining]
+engine_signer = "0x{{ account.stdout }}"
+reseal_on_txs = "none"
+
+[misc]
+log_file = "{{ home }}/logs/parity.log"

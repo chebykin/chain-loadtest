@@ -19,8 +19,8 @@
         command=droplet
         unique_name=yes
         size_id=1gb
-        region_id=ams3
-        image_id=ubuntu-17-10-x64
+        region_id={{ do_region }}
+        image_id={{ do_image_id }}
         ssh_key_ids={{ my_ssh_key.ssh_key.id }}
       with_items: "{{ droplets }}"
       register: droplet_details
@@ -43,5 +43,5 @@
     - name: add dropet IPs to hosts.txt
       lineinfile:
         path: ./hosts.txt
-        line: "{{ item.droplet.ip_address }}"
+        line: "{{ item.droplet.ip_address }} name={{ item.droplet.name }}"
       with_items: "{{ droplet_details.results }}"

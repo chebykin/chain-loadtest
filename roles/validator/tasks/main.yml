@@ -1,0 +1,69 @@
+---
+- name: Create keys directory
+  file:
+    path: "~{{ username }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}"
+    state: directory
+    mode: 0700
+    owner: "{{ username }}"
+    group: "{{ username }}"
+
+- name: Config mining key file
+  copy:
+    src: "./tmp/{{ timestamp }}/{{ name }}.json"
+    dest: "{{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/validator.key"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Fetch address from key file
+  shell: "grep -oP '(?<=\"address\":\")[^\"]*' {{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/validator.key"
+  register: account
+
+- name: Create validator directory
+  file:
+    path: ~{{ username }}/validator
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0700
+
+- name: Create logs directory
+  file:
+    path: "~{{ username }}/logs"
+    state: directory
+    mode: 0700
+    owner: "{{ username }}"
+    group: "{{ username }}"
+
+- name: Create an empty bootnodes.txt
+  copy:
+    content: ""
+    dest: "~{{ username }}/validator/bootnodes.txt"
+    force: no
+    group: "{{ username }}"
+    owner: "{{ username }}"
+    mode: 0644
+
+- name: Copy spec.json
+  copy:
+    src: "./tmp/{{ timestamp }}/spec.json"
+    dest: ~{{ username }}/validator/spec.json
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Copy node.toml
+  vars:
+    account: blah
+  template:
+    src: "node.j2"
+    dest: ~{{ username }}/validator/node.toml
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Save passphrase to file
+  lineinfile:
+    path: "~{{ username }}/validator/node.pwd"
+    line: "{{ name }}"
+    create: yes

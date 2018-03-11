@@ -1,0 +1,20 @@
+---
+- name: Install parity
+  apt:
+    deb: http://d1h4xl4cr1h0mo.cloudfront.net/v1.9.4/x86_64-unknown-linux-gnu/parity_1.9.4_ubuntu_amd64.deb
+
+- name: install parity service
+  template: src=parity.service.j2 dest=/etc/systemd/system/parity.service owner=root group=root mode=0755
+
+- name: ensure parity is running and enabled to start at boot
+  service: name=parity.service state=started enabled=yes
+
+- name: Fetch enode address string
+  shell: "grep -oP '(?<=Public node URL: ).*' {{ home}}/logs/parity.log"
+  register: enode
+
+- name: Save enode address
+  lineinfile:
+    path: ./bootnodes.txt
+    line: "{{ enode.stdout }}"
+  delegate_to: localhost
