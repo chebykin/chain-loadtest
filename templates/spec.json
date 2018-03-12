@@ -1,5 +1,5 @@
 {
-  "name": "AuraLoadTest",
+  "name": "PoaLoadTest",
   "engine": {
     "authorityRound": {
       "params": {

@@ -2,6 +2,5 @@
 home: /home/ubuntu
 username: ubuntu
 timestamp: 1520710993959
-validators_count: 2
 processor_count: 1
-genesis_network_name: AuraLoadTest
+genesis_network_name: PoaLoadTest

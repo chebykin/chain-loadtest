@@ -1,10 +1,5 @@
 - hosts: localhost
   gather_facts: yes
-  vars:
-    droplets:
-      - name: validator-1
-      - name: validator-2
-      - name: validator-3
   tasks:
     - name: ensure key exists at DigitalOcean
       digital_ocean: >
@@ -15,7 +10,7 @@
       register: my_ssh_key
 
     - digital_ocean: >
-        name={{ item.name }}
+        name={{ item }}
         state=present
         command=droplet
         unique_name=yes
@@ -23,7 +18,7 @@
         region_id={{ do_region }}
         image_id={{ do_image_id }}
         ssh_key_ids={{ my_ssh_key.ssh_key.id }}
-      with_items: "{{ droplets }}"
+      with_sequence: start=1 end={{ validators_count }} format=validator-%d
       register: droplet_details
 
     - debug:
