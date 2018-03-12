@@ -35,4 +35,11 @@ chainSpec.accounts[master] = {
 
 fs.writeFileSync(`${dir}/spec.json`, JSON.stringify(chainSpec, null, 2));
 
+let chainMap = {
+    master,
+    addresses
+};
+
+fs.writeFileSync(`${dir}/map.json`, JSON.stringify(chainMap, null, 2));
+
 console.log(`Generated keys and configs are located at ${dir}.`);
