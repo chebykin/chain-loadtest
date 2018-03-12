@@ -14,7 +14,7 @@
         state=present
         command=droplet
         unique_name=yes
-        size_id=1gb
+        size_id={{ do_size }}
         region_id={{ do_region }}
         image_id={{ do_image_id }}
         ssh_key_ids={{ my_ssh_key.ssh_key.id }}
