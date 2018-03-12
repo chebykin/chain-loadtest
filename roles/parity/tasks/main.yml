@@ -9,6 +9,10 @@
 - name: ensure parity is running and enabled to start at boot
   service: name=parity.service state=started enabled=yes
 
+- name: Sleep for 30 seconds until enode uppear in logs
+  wait_for: timeout=30
+  delegate_to: localhost
+
 - name: Fetch enode address string
   shell: "grep -oP '(?<=Public node URL: ).*' {{ home}}/logs/parity.log"
   register: enode
@@ -18,3 +22,14 @@
     path: ./bootnodes.txt
     line: "{{ enode.stdout }}"
   delegate_to: localhost
+
+- name: Replace bootnodes.txt at all hosts
+  copy:
+    src: ./bootnodes.txt
+    dest: "{{ home }}/validator/bootnodes.txt"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Restart parity
+  service: name=parity.service state=restarted

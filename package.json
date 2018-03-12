@@ -1,5 +1,5 @@
 {
-  "name": "aura-loadtest",
+  "name": "ethereum-poa-loadtest",
   "version": "1.0.0",
   "description": "## Intro",
   "main": "app.js",

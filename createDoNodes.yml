@@ -4,6 +4,7 @@
     droplets:
       - name: validator-1
       - name: validator-2
+      - name: validator-3
   tasks:
     - name: ensure key exists at DigitalOcean
       digital_ocean: >
