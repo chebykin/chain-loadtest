@@ -1,7 +1,7 @@
 const keythereum = require("keythereum");
 const fs = require("fs");
 
-const count = 10;
+const count = 5;
 const time = new Date().getTime();
 const dir = `./tmp/${time}`;
 
@@ -37,9 +37,12 @@ fs.writeFileSync(`${dir}/spec.json`, JSON.stringify(chainSpec, null, 2));
 
 let chainMap = {
     master,
-    addresses
 };
+
+for (let i = 0; i < addresses.length; i++) {
+    chainMap[`validator${i}`] = addresses[i];
+}
 
 fs.writeFileSync(`${dir}/map.json`, JSON.stringify(chainMap, null, 2));
 
-console.log(`Generated keys and configs are located at ${dir}.`);
+console.log(`Generated keys and configs are located at ${dir}. Don't forget to set this timestamp value in group_vars/validator`);

@@ -1,0 +1,12 @@
+- hosts: localhost
+  gather_facts: yes
+  tasks:
+    - name: "Remove droplets by tag (tn-{{ timestamp }}"
+      uri:
+        url: "https://api.digitalocean.com/v2/droplets?tag_name=tn-{{ timestamp }}"
+        method: DELETE
+        body_format: json
+        headers:
+          Content-Type: application/json
+          Authorization: "Bearer {{ lookup('env','DO_API_TOKEN') }}"
+        status_code: 200, 204
