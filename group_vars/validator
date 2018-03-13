@@ -1,6 +1,5 @@
 ---
 home: /home/ubuntu
 username: ubuntu
-timestamp: 1520710993959
 processor_count: 1
 genesis_network_name: PoaLoadTest

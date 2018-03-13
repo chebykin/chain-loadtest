@@ -1,4 +1,5 @@
 do_region: ams3
 do_image_id: ubuntu-17-10-x64
 do_size: s-1vcpu-1gb
-validators_count: 5
+validators_count: 2
+timestamp: 1520710993959
