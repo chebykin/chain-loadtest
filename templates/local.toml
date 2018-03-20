@@ -1,0 +1,28 @@
+[parity]
+chain = "./spec.json"
+
+[rpc]
+apis = ["web3", "eth", "parity", "personal", "net", "traces", "rpc"]
+cors=["all"]
+
+[websockets]
+disable = false
+
+[ipc]
+disable = false
+apis = ["web3", "eth", "parity", "personal", "net", "traces", "rpc"]
+path = "/tmp/parity.ipc"
+
+[ui]
+disable = false
+
+[network]
+reserved_peers = "../../bootnodes.txt"
+discovery = false
+
+[account]
+password = ["../../master.pwd"]
+
+[misc]
+# Logging pattern (`<module>=<level>`, e.g. `own_tx=trace`).
+logging = "miner=trace,own_tx,tx_queue=trace"

@@ -28,3 +28,5 @@ reseal_on_txs = "none"
 
 [misc]
 log_file = "{{ home }}/logs/parity.log"
+# Logging pattern (`<module>=<level>`, e.g. `own_tx=trace`).
+logging = "miner=trace,own_tx,tx_queue=trace"

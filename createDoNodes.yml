@@ -18,7 +18,7 @@
         region_id={{ do_region }}
         image_id={{ do_image_id }}
         ssh_key_ids={{ my_ssh_key.ssh_key.id }}
-      with_sequence: start=1 end={{ validators_count }} format=validator-%d
+      with_sequence: start=0 end={{ validators_count - 1 }} format=validator-%d
       register: droplet_details
 
     - debug:
