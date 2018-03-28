@@ -9,10 +9,15 @@ const allConfig = YAML.load("./group_vars/all");
 const peersCount = allConfig['peers_count'];
 const validatorsCount = allConfig['validators_count'];
 
-let accounts = [];
+let peers = [];
+let validators = [];
 
 if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
+}
+
+if (!fs.existsSync(`${dir}/vpeers`)) {
+    fs.mkdirSync(`${dir}/vpeers`);
 }
 
 function generate(name) {
@@ -28,13 +33,14 @@ function generate(name) {
 console.log('Generating peer accounts....');
 
 for (let i = 0; i < peersCount; i++) {
-    accounts.push(generate(`peer-${i}`));
+    peers.push(generate(`peer-${i}`));
 }
 
-console.log('Generating peer accounts....');
+console.log('Generating validator accounts....');
 
 for (let i = 0; i < validatorsCount; i++) {
-    accounts.push(generate(`validator-${i}`));
+    validators.push(generate(`validator-${i}`));
+    peers.push(generate(`vpeers/validator-${i}`));
 }
 
 console.log('Generating master account ....');
@@ -42,13 +48,13 @@ console.log('Generating master account ....');
 let master = generate('master');
 
 let chainSpec = JSON.parse(fs.readFileSync("./templates/spec.json"));
-chainSpec.engine.authorityRound.params.validators.list = accounts;
+chainSpec.engine.authorityRound.params.validators.list = validators;
 chainSpec.accounts[master] = {
     balance: "252460800000000000000000000"
 };
 
-for (let i = 0; i < accounts.length; i++) {
-    chainSpec.accounts[accounts[i]] = {
+for (let i = 0; i < peers.length; i++) {
+    chainSpec.accounts[peers[i]] = {
         balance: "100000000000000000000000"
     };
 }
@@ -59,7 +65,8 @@ console.log('Generating chain map...');
 
 let chainMap = {
     master,
-    accounts
+    validators,
+    peers,
 };
 
 fs.writeFileSync(`${dir}/map.json`, JSON.stringify(chainMap, null, 2));
