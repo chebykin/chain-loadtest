@@ -3,7 +3,7 @@ Description=Parity Daemon
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/parity --config /home/ubuntu/validator/node.toml
+ExecStart=/usr/bin/parity --config /home/ubuntu/node.toml
 # To run as user, comment out above and uncomment below, fill in user and group
 # picks up users default config.toml in $HOME/.local/share/io.parity.ethereum/
 User=ubuntu

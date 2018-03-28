@@ -1,9 +1,13 @@
 const keythereum = require("keythereum");
 const fs = require("fs");
+YAML = require('yamljs');
 
-const count = 5;
 const time = new Date().getTime();
 const dir = `./tmp/${time}`;
+
+const allConfig = YAML.load("./group_vars/all");
+const peersCount = allConfig['peers_count'];
+const validatorsCount = allConfig['validators_count'];
 
 let accounts = [];
 
@@ -21,11 +25,19 @@ function generate(name) {
     return keythereum.privateKeyToAddress(dk.privateKey);
 }
 
-for (let i = 0; i < count; i++) {
+console.log('Generating peer accounts....');
+
+for (let i = 0; i < peersCount; i++) {
+    accounts.push(generate(`peer-${i}`));
+}
+
+console.log('Generating peer accounts....');
+
+for (let i = 0; i < validatorsCount; i++) {
     accounts.push(generate(`validator-${i}`));
 }
 
-console.log('Generating accounts....');
+console.log('Generating master account ....');
 
 let master = generate('master');
 

@@ -18,7 +18,7 @@
         region_id={{ do_region }}
         image_id={{ do_image_id }}
         ssh_key_ids={{ my_ssh_key.ssh_key.id }}
-      with_sequence: start=0 end={{ validators_count - 1 }} format=validator-%d
+      with_sequence: start=0 end={{ peers_count - 1 }} format=peer-%d
       register: droplet_details
 
     - debug:
@@ -33,8 +33,45 @@
     - name: create new hosts.txt
       lineinfile:
         path: ./hosts.txt
-        line: "[validator]"
+        line: "[peer]"
         create: yes
+
+    - name: add dropet IPs to hosts.txt
+      lineinfile:
+        path: ./hosts.txt
+        line: "{{ item.droplet.ip_address }} name={{ item.droplet.name }}"
+      with_items: "{{ droplet_details.results }}"
+
+    - debug:
+        msg: "IP: {{ item.droplet.ip_address }}, ID: {{ item.droplet.id }}"
+      with_items: "{{ droplet_details.results }}"
+
+    - digital_ocean_tag:
+        name: "tn-{{ timestamp}}"
+        resource_id: "{{ item.droplet.id }}"
+        state: present
+      with_items: "{{ droplet_details.results }}"
+
+    - digital_ocean: >
+        name={{ item }}
+        state=present
+        command=droplet
+        unique_name=yes
+        size_id={{ do_size }}
+        region_id={{ do_region }}
+        image_id={{ do_image_id }}
+        ssh_key_ids={{ my_ssh_key.ssh_key.id }}
+      with_sequence: start=0 end={{ validators_count - 1 }} format=validator-%d
+      register: droplet_details
+
+    - debug:
+        msg: "IP is {{ item.droplet.ip_address }}"
+      with_items: "{{ droplet_details.results }}"
+
+    - name: create new hosts.txt
+      lineinfile:
+        path: ./hosts.txt
+        line: "\n[validator]"
 
     - name: add dropet IPs to hosts.txt
       lineinfile:

@@ -2,7 +2,7 @@
 chain = "{{ home }}/spec.json"
 
 [rpc]
-apis = ["web3", "eth", "parity", "parity_set", "net", "traces", "rpc"]
+apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
 processing_threads = {{ processor_count }}
 cors=["all"]
 
@@ -18,13 +18,6 @@ disable = true
 [network]
 reserved_peers = "{{ home }}/bootnodes.txt"
 discovery = false
-
-[account]
-password = ["{{ home }}/node.pwd"]
-
-[mining]
-engine_signer = "0x{{ account.stdout }}"
-reseal_on_txs = "none"
 
 [misc]
 log_file = "{{ home }}/logs/parity.log"

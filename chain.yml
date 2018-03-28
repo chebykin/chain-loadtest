@@ -6,11 +6,18 @@
     - preconf
 
 - name: Configure validator
-  hosts: all
+  hosts: validator
   gather_facts: yes
   remote_user: ubuntu
   roles:
     - validator
+
+- name: Configure validator
+  hosts: peer
+  gather_facts: yes
+  remote_user: ubuntu
+  roles:
+    - peer
 
 - name: Configure ubuntu
   hosts: all
@@ -18,3 +25,10 @@
   remote_user: root
   roles:
     - parity
+
+- name: Configure monitoring toolkit
+  hosts: all
+  gather_facts: no
+  remote_user: root
+  roles:
+    - monitoring

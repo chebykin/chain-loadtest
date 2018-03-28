@@ -26,7 +26,7 @@
 - name: Replace bootnodes.txt at all hosts
   copy:
     src: ./bootnodes.txt
-    dest: "{{ home }}/validator/bootnodes.txt"
+    dest: "{{ home }}/bootnodes.txt"
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: 0644

@@ -19,13 +19,13 @@
   shell: "grep -oP '(?<=\"address\":\")[^\"]*' {{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/validator.key"
   register: account
 
-- name: Create validator directory
-  file:
-    path: ~{{ username }}/validator
-    state: directory
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0700
+#- name: Create validator directory
+#  file:
+#    path: ~{{ username }}/validator
+#    state: directory
+#    owner: "{{ username }}"
+#    group: "{{ username }}"
+#    mode: 0700
 
 - name: Create logs directory
   file:
@@ -38,7 +38,7 @@
 - name: Create an empty bootnodes.txt
   copy:
     content: ""
-    dest: "~{{ username }}/validator/bootnodes.txt"
+    dest: "~{{ username }}/bootnodes.txt"
     force: no
     group: "{{ username }}"
     owner: "{{ username }}"
@@ -47,23 +47,21 @@
 - name: Copy spec.json
   copy:
     src: "./tmp/{{ timestamp }}/spec.json"
-    dest: ~{{ username }}/validator/spec.json
+    dest: ~{{ username }}/spec.json
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: 0644
 
 - name: Copy node.toml
-  vars:
-    account: blah
   template:
     src: "node.j2"
-    dest: ~{{ username }}/validator/node.toml
+    dest: ~{{ username }}/node.toml
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: 0644
 
 - name: Save passphrase to file
   lineinfile:
-    path: "~{{ username }}/validator/node.pwd"
+    path: "~{{ username }}/node.pwd"
     line: "{{ name }}"
     create: yes

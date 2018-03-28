@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/big"
-	"os"
 	"path/filepath"
 	"strconv"
 	"sync"
@@ -13,21 +12,29 @@ import (
 	web3 "github.com/chebykin/go-web3"
 	"github.com/chebykin/go-web3/providers"
 	"github.com/regcostajr/go-web3/dto"
+	"github.com/gorilla/mux"
+	"net/http"
+	"time"
+	"log"
+	"errors"
 )
 
 // Ether multiplier
 const METHER = 1000000000000000000
+// TODO: should be configured using env
+// How many working threads parity has sat in rpc config section
+const WORKERS_COUNT = 4
 
 var chainMap *ChainMap
 var connection *web3.Web3
 
+// Agent starts http server to receive instructions from the master.
+// It sends statistics to statsd daemon.
 func main() {
 	connection = web3.NewWeb3(
 		providers.NewHTTPProvider("127.0.0.1:8545", 10, false))
 	// providers.NewWebSocketProvider("ws://127.0.0.1:8546"))
 	// providers.NewIPCProvider("/tmp/parity.ipc"))
-
-	cmd := os.Args[1]
 
 	abs, _ := filepath.Abs("./tmp/latest/map.json")
 	fmt.Println(abs)
@@ -42,20 +49,51 @@ func main() {
 		panic(fmt.Sprintln("Unable to parse chain map file:", err))
 	}
 
-	switch cmd {
-	case "master":
-		master()
-	case "monkey":
-		validatorIdStr := os.Args[2]
-		validatorId, err := strconv.Atoi(validatorIdStr)
-		if err != nil {
-			panic("Wrong validator id, use only numbers")
-		}
-
-		monkey(validatorId)
-	}
+	server()
 }
 
+func server() {
+	r := mux.NewRouter()
+	r.Path("/orders").HandlerFunc(ordersHandler)
+	addr := "0.0.0.0:8080"
+
+	srv := &http.Server{
+		Handler:      r,
+		Addr:         addr,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  20 * time.Second,
+	}
+
+	log.Println("Listening at", addr)
+	log.Fatal(srv.ListenAndServe())
+}
+
+func ordersHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO: add a secret key validation
+	// TODO: parse request query for instructions
+
+	log.Println(r.URL.Query().Get("sendtx"))
+	count, err := strconv.Atoi(r.URL.Query().Get("sendtx"))
+	if err != nil {
+		log.Println("Wrong number of txs", err)
+		respondWithError(w, http.StatusBadRequest, errors.New("Wrong number of txs"))
+		return
+	}
+
+	result := monkey(count)
+	resultBytes, err := json.Marshal(result)
+	if err != nil {
+		e := errors.New(fmt.Sprintln("Error occured while executing the order: ", err.Error()))
+		log.Println(e)
+		respondWithError(w, http.StatusInternalServerError, e)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, string(resultBytes))
+}
+
+// TODO: move to another script
 func master() {
 	var wg sync.WaitGroup
 	val := big.NewInt(0).Mul(big.NewInt(200), big.NewInt(1E18))
@@ -80,38 +118,41 @@ func master() {
 	wg.Wait()
 }
 
-func monkey(validatorId int) {
-	fmt.Println("monkey", validatorId)
-
-	count := 500
+// Monkey will start a loop which sends either to each peer and validator
+func monkey(count int) []sendResult {
 	j := 0
 	val := big.NewInt(0).Mul(big.NewInt(34), big.NewInt(1E16))
 
-	jobs := make(chan sendOpts)
-	results := make(chan sendResult)
+	jobsCh := make(chan sendOpts)
+	resultsCh := make(chan sendResult)
+
+	results := make([]sendResult, count)
 
 	var wg sync.WaitGroup
 	wg.Add(count)
 
 	go func() {
 		for i := 0; i < count; i++ {
-			fmt.Println(<-results)
+			result := <-resultsCh
+			log.Println("<<<", result)
+			results[i] = result
 			wg.Done()
 		}
 	}()
 
-	for w := 0; w < 50; w++ {
-		go monkeyWorker(w, jobs, results)
+	log.Println("Launching", WORKERS_COUNT, "workers...")
+	for w := 0; w < WORKERS_COUNT; w++ {
+		go monkeyWorker(w, jobsCh, resultsCh)
 	}
 
-	fmt.Println("Scheduling jobs...")
+	log.Println("Scheduling jobs...")
 	for i := 0; i < count; i++ {
-		jobs <- sendOpts{
+		jobsCh <- sendOpts{
 			Val:       val,
 			Addressee: chainMap.Accounts[j],
 		}
 
-		fmt.Printf("Job #%d scheduled\n", i)
+		log.Printf("Job #%d scheduled\n", i)
 
 		j++
 		if j == 5 {
@@ -119,9 +160,11 @@ func monkey(validatorId int) {
 		}
 	}
 
-	fmt.Println("Waiting for results...")
+	fmt.Println("Waiting for resultsCh...")
 
 	wg.Wait()
+
+	return results
 }
 
 func monkeyWorker(id int, msgs <-chan sendOpts, results chan<- sendResult) {
@@ -146,11 +189,16 @@ func monkeyWorker(id int, msgs <-chan sendOpts, results chan<- sendResult) {
 			}
 		} else {
 			results <- sendResult{
-				Error: true,
+				Error: false,
 				Msg:   fmt.Sprintf("done, %s", txId),
 			}
 		}
 	}
+}
+
+func respondWithError(w http.ResponseWriter, httpStatus int, err error) {
+	w.WriteHeader(httpStatus)
+	fmt.Fprintf(w, err.Error())
 }
 
 type sendOpts struct {

@@ -12,6 +12,13 @@ pip install git+git://github.com/dfundingsland/dopy.git#egg=dopy
 
 ## Workflow
 
+### Step 0. Build stuff
+#### Build agent
+You have to build an agent for `amd64` platform
+
+#### Build statsd
+Build statsd and move it to tmp folder
+
 ### Step 1. Generate chain configs and validator keys
 * Modify `count` constant in app.js file to match the number of required validators in the network.
 * generate private keys for all accounts (using `node.js`)

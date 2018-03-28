@@ -1,5 +1,18 @@
 do_region: ams3
 do_image_id: ubuntu-17-10-x64
 do_size: s-1vcpu-1gb
-validators_count: 2
-timestamp: 1520710993959
+peers_count: 2
+validators_count: 3
+timestamp: 1522245905507
+peers:
+    - peer-1
+    - peer-2
+validators:
+    - validator-1
+    - validator-2
+    - validator-3
+
+home: /home/ubuntu
+username: ubuntu
+processor_count: 1
+genesis_network_name: PoaLoadTest

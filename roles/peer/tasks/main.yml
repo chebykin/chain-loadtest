@@ -1,0 +1,41 @@
+---
+#- name: Create peer directory
+#  file:
+#    path: ~{{ username }}/peer
+#    state: directory
+#    owner: "{{ username }}"
+#    group: "{{ username }}"
+#    mode: 0700
+
+- name: Create logs directory
+  file:
+    path: "~{{ username }}/logs"
+    state: directory
+    mode: 0700
+    owner: "{{ username }}"
+    group: "{{ username }}"
+
+- name: Create an empty bootnodes.txt
+  copy:
+    content: ""
+    dest: "~{{ username }}/bootnodes.txt"
+    force: no
+    group: "{{ username }}"
+    owner: "{{ username }}"
+    mode: 0644
+
+- name: Copy spec.json
+  copy:
+    src: "./tmp/{{ timestamp }}/spec.json"
+    dest: ~{{ username }}/spec.json
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Copy node.toml
+  template:
+    src: "node.j2"
+    dest: ~{{ username }}/node.toml
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
