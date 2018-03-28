@@ -47,6 +47,12 @@ chainSpec.accounts[master] = {
     balance: "252460800000000000000000000"
 };
 
+for (let i = 0; i < accounts.length; i++) {
+    chainSpec.accounts[accounts[i]] = {
+        balance: "100000000000000000000000"
+    };
+}
+
 fs.writeFileSync(`${dir}/spec.json`, JSON.stringify(chainSpec, null, 2));
 
 console.log('Generating chain map...');
@@ -62,6 +68,11 @@ console.log('Copying Parity configs...');
 
 fs.createReadStream('./templates/local.toml').pipe(fs.createWriteStream(`./tmp/${time}/local.toml`));
 
+console.log('Saving timestamp to all config ...');
+
+allConfig.timestamp = time;
+fs.writeFileSync("./group_vars/all", YAML.stringify(allConfig));
+
 console.log('Creating latest symlink...');
 
 try {
@@ -70,4 +81,4 @@ try {
 }
 fs.symlinkSync(`./${time}`, './tmp/latest');
 
-console.log(`\nDone!\n\nGenerated keys and configs are located at ${dir}. Don't forget to set this timestamp value in group_vars/validator\n`);
+console.log(`\nDone!\n\nGenerated keys and configs are located at ${dir}.\n`);
