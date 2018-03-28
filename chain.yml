@@ -25,10 +25,11 @@
   remote_user: root
   roles:
     - parity
+    - monitoring
 
-- name: Configure monitoring toolkit
+- name: Configure agent
   hosts: all
   gather_facts: no
-  remote_user: root
+  remote_user: ubuntu
   roles:
-    - monitoring
+    - agent

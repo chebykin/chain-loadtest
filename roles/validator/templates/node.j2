@@ -2,18 +2,27 @@
 chain = "{{ home }}/spec.json"
 
 [rpc]
-apis = ["web3", "eth", "parity", "parity_set", "net", "traces", "rpc"]
+# TODO: replace with 127.0.0.1
+interface = "0.0.0.0"
+apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
 processing_threads = {{ processor_count }}
 cors=["all"]
 
+# TODO: disable websockets
 [websockets]
-disable = true
+interface = "0.0.0.0"
+hosts = ["all"]
+origins = ["all"]
+apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
+disable = false
 
 [ipc]
 disable = true
 
 [ui]
-disable = true
+# TODO: remove interface replace with false
+interface = "0.0.0.0"
+disable = false
 
 [network]
 reserved_peers = "{{ home }}/bootnodes.txt"

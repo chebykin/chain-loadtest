@@ -1,11 +1,23 @@
 ---
-#- name: Create peer directory
-#  file:
-#    path: ~{{ username }}/peer
-#    state: directory
-#    owner: "{{ username }}"
-#    group: "{{ username }}"
-#    mode: 0700
+- name: Create keys directory
+  file:
+    path: "~{{ username }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}"
+    state: directory
+    mode: 0700
+    owner: "{{ username }}"
+    group: "{{ username }}"
+
+- name: Config mining key file
+  copy:
+    src: "./tmp/{{ timestamp }}/{{ name }}.json"
+    dest: "{{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/peer.key"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Fetch address from key file
+  shell: "grep -oP '(?<=\"address\":\")[^\"]*' {{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/peer.key"
+  register: account
 
 - name: Create logs directory
   file:
@@ -39,3 +51,9 @@
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: 0644
+
+- name: Save passphrase to file
+  lineinfile:
+    path: "~{{ username }}/node.pwd"
+    line: "{{ name }}"
+    create: yes

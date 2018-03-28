@@ -2,6 +2,7 @@
 chain = "{{ home }}/spec.json"
 
 [rpc]
+interface = "127.0.0.1"
 apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
 processing_threads = {{ processor_count }}
 cors=["all"]
@@ -18,6 +19,10 @@ disable = true
 [network]
 reserved_peers = "{{ home }}/bootnodes.txt"
 discovery = false
+
+[account]
+password = ["{{ home }}/node.pwd"]
+unlock = ["0x{{ account.stdout }}"]
 
 [misc]
 log_file = "{{ home }}/logs/parity.log"

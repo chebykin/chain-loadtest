@@ -7,7 +7,7 @@
     owner: "{{ username }}"
     group: "{{ username }}"
 
-- name: Config mining key file
+- name: Copy mining (validator) key file
   copy:
     src: "./tmp/{{ timestamp }}/{{ name }}.json"
     dest: "{{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/validator.key"
@@ -15,17 +15,17 @@
     group: "{{ username }}"
     mode: 0644
 
-- name: Fetch address from key file
+- name: Copy peer key file
+  copy:
+    src: "./tmp/{{ timestamp }}/vpeers/{{ name }}.json"
+    dest: "{{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/peer.key"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Fetch mining address from key file
   shell: "grep -oP '(?<=\"address\":\")[^\"]*' {{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/validator.key"
   register: account
-
-#- name: Create validator directory
-#  file:
-#    path: ~{{ username }}/validator
-#    state: directory
-#    owner: "{{ username }}"
-#    group: "{{ username }}"
-#    mode: 0700
 
 - name: Create logs directory
   file:
