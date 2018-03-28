@@ -3,3 +3,4 @@ node_modules
 tmp
 hosts.txt
 *.retry
+agent/agent
