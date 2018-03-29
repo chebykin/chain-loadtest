@@ -1,15 +1,13 @@
 [Unit]
-Description=Parity Daemon
+Description=POA LoadTest Agent Daemon
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/parity --config /home/ubuntu/node.toml
-# To run as user, comment out above and uncomment below, fill in user and group
-# picks up users default config.toml in $HOME/.local/share/io.parity.ethereum/
+ExecStart=/home/ubuntu/agent
 User=ubuntu
 Group=ubuntu
-# ExecStart=/usr/bin/parity
 Restart=on-failure
+WorkingDirectory=/home/ubuntu
 
 # Specifies which signal to use when killing a service. Defaults to SIGTERM.
 # SIGHUP gives parity time to exit cleanly before SIGKILL (default 90s)

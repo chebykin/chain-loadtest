@@ -9,3 +9,6 @@ seed-nodes:
 
 agent-linux:
 	GOOS=linux GOARCH=amd64 go build -o agent/agent agent/agent.go
+
+manager:
+	cd manager && python -m http.server 9000

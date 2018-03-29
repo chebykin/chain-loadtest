@@ -1,38 +1,34 @@
 ---
+- name: Copy agent executable
+  copy:
+    src: "./agent/agent"
+    dest: "{{ home }}/agent"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0755
 
-# TODO: copy agent
-# TODO: setup agent as a service
-# TODO: import associated key to parity (parity import)
+- name: Copy chain map
+  copy:
+    src: "./tmp/{{ timestamp }}/map.json"
+    dest: "{{ home }}/map.json"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
 
-#- name: Create logs directory
-#  file:
-#    path: "~{{ username }}/logs"
-#    state: directory
-#    mode: 0700
-#    owner: "{{ username }}"
-#    group: "{{ username }}"
-#
-#- name: Create an empty bootnodes.txt
-#  copy:
-#    content: ""
-#    dest: "~{{ username }}/bootnodes.txt"
-#    force: no
-#    group: "{{ username }}"
-#    owner: "{{ username }}"
-#    mode: 0644
-#
-#- name: Copy spec.json
-#  copy:
-#    src: "./tmp/{{ timestamp }}/spec.json"
-#    dest: ~{{ username }}/spec.json
-#    owner: "{{ username }}"
-#    group: "{{ username }}"
-#    mode: 0644
-#
-#- name: Copy node.toml
-#  template:
-#    src: "node.j2"
-#    dest: ~{{ username }}/node.toml
-#    owner: "{{ username }}"
-#    group: "{{ username }}"
-#    mode: 0644
+- name: Fetch address from key file
+  shell: "grep -oP '(?<=\"address\":\")[^\"]*' {{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/peer.key"
+  register: address
+
+- name: Copy config json
+  template:
+    src: "config.json.j2"
+    dest: "{{ home }}/config.json"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: install poa-agent service
+  template: src=poa-agent.service.j2 dest=/etc/systemd/system/poa-agent.service owner=root group=root mode=0755
+
+- name: ensure poa-agemt is running and enabled to start at boot
+  service: name=poa-agent.service state=restarted enabled=yes daemon_reload=yes

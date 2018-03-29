@@ -1,0 +1,6 @@
+- name: Configure agent
+  hosts: all
+  gather_facts: no
+  remote_user: root
+  roles:
+    - agent

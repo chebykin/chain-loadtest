@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/big"
-	"path/filepath"
 	"strconv"
 	"sync"
 
-	web3 "github.com/chebykin/go-web3"
+	"github.com/chebykin/go-web3"
 	"github.com/chebykin/go-web3/providers"
 	"github.com/regcostajr/go-web3/dto"
 	"github.com/gorilla/mux"
@@ -17,6 +16,8 @@ import (
 	"time"
 	"log"
 	"errors"
+	"github.com/cactus/go-statsd-client/statsd"
+	"context"
 )
 
 // Ether multiplier
@@ -25,29 +26,51 @@ const METHER = 1000000000000000000
 // How many working threads parity has sat in rpc config section
 const WORKERS_COUNT = 4
 
+var config *Configuration
 var chainMap *ChainMap
 var connection *web3.Web3
+var statsdClient statsd.Statter
 
 // Agent starts http server to receive instructions from the master.
 // It sends statistics to statsd daemon.
 func main() {
-	connection = web3.NewWeb3(
-		providers.NewHTTPProvider("127.0.0.1:8545", 10, false))
-	// providers.NewWebSocketProvider("ws://127.0.0.1:8546"))
-	// providers.NewIPCProvider("/tmp/parity.ipc"))
-
-	abs, _ := filepath.Abs("./tmp/latest/map.json")
-	fmt.Println(abs)
-
-	file, err := ioutil.ReadFile(abs)
+	// Reading config file
+	file, err := ioutil.ReadFile("./config.json")
 	if err != nil {
-		panic("Unable to read chain map file")
+		log.Panicln("Unable to locate config.json file:", err)
+	}
+
+	err = json.Unmarshal(file, &config)
+	if err != nil {
+		log.Panicln("Failed to decode config file:", err)
+	}
+
+	// Reading chain map
+	file, err = ioutil.ReadFile("./map.json")
+	if err != nil {
+		log.Panicln("Unable to read chain map file:", err)
 	}
 
 	err = json.Unmarshal(file, &chainMap)
 	if err != nil {
-		panic(fmt.Sprintln("Unable to parse chain map file:", err))
+		log.Panicln("Unable to parse chain map file:", err)
 	}
+
+	connection = web3.NewWeb3(
+		providers.NewHTTPProvider(config.RpcEndpoint, 10, false))
+
+	coinbase, err := connection.Eth.GetCoinbase()
+	if err != nil {
+		log.Panicln("Failed to get coinbase", err)
+	}
+	log.Println("coinbase", coinbase)
+
+	statsdClient, err = statsd.NewClient("127.0.0.1:8125", "test-client")
+	if err != nil {
+		log.Panicln("Failed to connect statsd server:", err)
+	}
+
+	defer statsdClient.Close()
 
 	server()
 }
@@ -80,7 +103,14 @@ func ordersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := monkey(count)
+	if count > config.TxLimit {
+		msg := fmt.Sprintln("Request tx count exceeded limit of", config.TxLimit)
+		log.Println(msg)
+		respondWithError(w, http.StatusBadRequest, errors.New(msg))
+		return
+	}
+
+	result := monkey(count, r.Context())
 	resultBytes, err := json.Marshal(result)
 	if err != nil {
 		e := errors.New(fmt.Sprintln("Error occured while executing the order: ", err.Error()))
@@ -93,38 +123,22 @@ func ordersHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(resultBytes))
 }
 
-// TODO: move to another script
-func master() {
-	var wg sync.WaitGroup
-	val := big.NewInt(0).Mul(big.NewInt(200), big.NewInt(1E18))
-
-	for _, account := range chainMap.Accounts {
-		wg.Add(1)
-		go func(a string) {
-			txId, err := connection.Personal.SendTransaction(&dto.TransactionParameters{
-				From:  chainMap.Master,
-				To:    a,
-				Value: val,
-			}, "master")
-			if err != nil {
-				fmt.Println("Failed to send tx", err)
-			} else {
-				fmt.Println("done", txId)
-			}
-			wg.Done()
-		}(account)
+// Monkey will start a loop which sends either to each peer and validator
+func monkey(count int, ctx context.Context) []sendResult {
+	j := 0
+	jLimit := len(chainMap.Peers)
+	if jLimit < j {
+		j = jLimit - 1
 	}
 
-	wg.Wait()
-}
-
-// Monkey will start a loop which sends either to each peer and validator
-func monkey(count int) []sendResult {
-	j := 0
+	log.Println("Peers count", len(chainMap.Peers))
 	val := big.NewInt(0).Mul(big.NewInt(34), big.NewInt(1E16))
 
 	jobsCh := make(chan sendOpts)
 	resultsCh := make(chan sendResult)
+
+	defer close(jobsCh)
+	defer close(resultsCh)
 
 	results := make([]sendResult, count)
 
@@ -133,9 +147,17 @@ func monkey(count int) []sendResult {
 
 	go func() {
 		for i := 0; i < count; i++ {
-			result := <-resultsCh
-			log.Println("<<<", result)
-			results[i] = result
+			select {
+			case result := <-resultsCh:
+				log.Println("<<<", result)
+				statsdClient.Inc("txsend", 1, 1.0)
+
+				// TODO: push info to statsd
+				results[i] = result
+			case <-ctx.Done():
+				log.Printf("Request cancelled. Skipping result for #%d\n", i)
+				// nothing
+			}
 			wg.Done()
 		}
 	}()
@@ -149,14 +171,21 @@ func monkey(count int) []sendResult {
 	for i := 0; i < count; i++ {
 		jobsCh <- sendOpts{
 			Val:       val,
-			Addressee: chainMap.Accounts[j],
+			Addressee: chainMap.Peers[j],
 		}
 
 		log.Printf("Job #%d scheduled\n", i)
 
 		j++
-		if j == 5 {
+		if j == jLimit {
 			j = 0
+		}
+
+		select {
+		case <-ctx.Done():
+			break
+		default:
+			// do nothing
 		}
 	}
 
@@ -169,18 +198,18 @@ func monkey(count int) []sendResult {
 
 func monkeyWorker(id int, msgs <-chan sendOpts, results chan<- sendResult) {
 	// TODO: create an own client
-	// connection := web3.NewWeb3(
-	// 	providers.NewHTTPProvider("127.0.0.1:8545", 10, false))
+	connection := web3.NewWeb3(
+		providers.NewHTTPProvider(config.RpcEndpoint, 10, false))
 	// providers.NewWebSocketProvider("ws://127.0.0.1:8546"))
 	// providers.NewIPCProvider("/tmp/parity.ipc"))
 
 	for m := range msgs {
 		txId, err := connection.Personal.SendTransaction(&dto.TransactionParameters{
-			From:  chainMap.Master,
+			From:  config.Me.Address,
 			To:    m.Addressee,
 			Value: m.Val,
 			Gas:   big.NewInt(21999),
-		}, "master")
+		}, config.Me.Password)
 
 		if err != nil {
 			results <- sendResult{
@@ -217,5 +246,16 @@ func (s *sendResult) String() string {
 
 type ChainMap struct {
 	Master   string
-	Accounts []string
+	Peers []string
+	Validators []string
+}
+
+type Configuration struct {
+	Me struct {
+		Address  string
+		Password string
+	}
+	RpcEndpoint string
+	Secret string
+	TxLimit int
 }
