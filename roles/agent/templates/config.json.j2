@@ -9,5 +9,6 @@
   },
   "rpcEndpoint": "127.0.0.1:8545",
   "secret": "{{ agent_secret }}",
-  "txLimit": 1000
+  "txLimit": 3000,
+  "workersCount": {{ processor_count * 2 }}
 }

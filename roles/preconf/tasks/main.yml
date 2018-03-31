@@ -2,6 +2,20 @@
 - name: 'Install python2'
   raw: sudo apt-get -y install python-simplejson
 
+- name: Upgrade packages
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install ntpdate
+  apt:
+    name:
+      - ntpdate
+
+- name: Sync time with ntp server
+  shell: "ntpdate 0.nl.pool.ntp.org"
+
 - name: Create new user
   user:
     name: ubuntu

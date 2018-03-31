@@ -33,6 +33,8 @@ password = ["{{ home }}/node.pwd"]
 
 [mining]
 engine_signer = "0x{{ account.stdout }}"
+tx_queue_size = 8192
+force_sealing = true
 reseal_on_txs = "none"
 
 [misc]

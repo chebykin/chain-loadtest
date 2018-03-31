@@ -12,7 +12,7 @@
   roles:
     - validator
 
-- name: Configure validator
+- name: Configure peer
   hosts: peer
   gather_facts: yes
   remote_user: ubuntu

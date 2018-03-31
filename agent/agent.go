@@ -8,23 +8,24 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/chebykin/go-web3"
-	"github.com/chebykin/go-web3/providers"
-	"github.com/regcostajr/go-web3/dto"
-	"github.com/gorilla/mux"
+	"context"
+	"errors"
+	"log"
 	"net/http"
 	"time"
-	"log"
-	"errors"
+
 	"github.com/cactus/go-statsd-client/statsd"
-	"context"
+	"github.com/chebykin/go-web3"
+	"github.com/chebykin/go-web3/providers"
+	"github.com/gorilla/mux"
+	"github.com/regcostajr/go-web3/dto"
 )
 
 // Ether multiplier
 const METHER = 1000000000000000000
+
 // TODO: should be configured using env
 // How many working threads parity has sat in rpc config section
-const WORKERS_COUNT = 4
 
 var config *Configuration
 var chainMap *ChainMap
@@ -92,19 +93,23 @@ func server() {
 }
 
 func ordersHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: add a secret key validation
-	// TODO: parse request query for instructions
+	secret := r.URL.Query().Get("secret")
+	if secret != config.Secret {
+		log.Println("Wrong secret")
+		respondWithError(w, http.StatusBadRequest, errors.New("wrong secret"))
+		return
+	}
 
 	log.Println(r.URL.Query().Get("sendtx"))
 	count, err := strconv.Atoi(r.URL.Query().Get("sendtx"))
 	if err != nil {
 		log.Println("Wrong number of txs", err)
-		respondWithError(w, http.StatusBadRequest, errors.New("Wrong number of txs"))
+		respondWithError(w, http.StatusBadRequest, errors.New("wrong number of txs"))
 		return
 	}
 
 	if count > config.TxLimit {
-		msg := fmt.Sprintln("Request tx count exceeded limit of", config.TxLimit)
+		msg := fmt.Sprintln("request tx count exceeded limit of", config.TxLimit)
 		log.Println(msg)
 		respondWithError(w, http.StatusBadRequest, errors.New(msg))
 		return
@@ -113,7 +118,7 @@ func ordersHandler(w http.ResponseWriter, r *http.Request) {
 	result := monkey(count, r.Context())
 	resultBytes, err := json.Marshal(result)
 	if err != nil {
-		e := errors.New(fmt.Sprintln("Error occured while executing the order: ", err.Error()))
+		e := errors.New(fmt.Sprintln("error occured while executing the order: ", err.Error()))
 		log.Println(e)
 		respondWithError(w, http.StatusInternalServerError, e)
 		return
@@ -152,6 +157,9 @@ func monkey(count int, ctx context.Context) []sendResult {
 				log.Println("<<<", result)
 				statsdClient.Inc("txsend", 1, 1.0)
 
+				if result.Error {
+					statsdClient.Inc("txerr", 1, 1.0)
+				}
 				// TODO: push info to statsd
 				results[i] = result
 			case <-ctx.Done():
@@ -162,8 +170,8 @@ func monkey(count int, ctx context.Context) []sendResult {
 		}
 	}()
 
-	log.Println("Launching", WORKERS_COUNT, "workers...")
-	for w := 0; w < WORKERS_COUNT; w++ {
+	log.Println("Launching", config.WorkersCount, "workers...")
+	for w := 0; w < config.WorkersCount; w++ {
 		go monkeyWorker(w, jobsCh, resultsCh)
 	}
 
@@ -245,8 +253,8 @@ func (s *sendResult) String() string {
 }
 
 type ChainMap struct {
-	Master   string
-	Peers []string
+	Master     string
+	Peers      []string
 	Validators []string
 }
 
@@ -255,7 +263,8 @@ type Configuration struct {
 		Address  string
 		Password string
 	}
-	RpcEndpoint string
-	Secret string
-	TxLimit int
+	RpcEndpoint  string
+	Secret       string
+	TxLimit      int
+	WorkersCount int
 }
