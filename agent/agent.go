@@ -66,7 +66,7 @@ func main() {
 	}
 	log.Println("coinbase", coinbase)
 
-	statsdClient, err = statsd.NewClient("127.0.0.1:8125", "test-client")
+	statsdClient, err = statsd.NewClient("127.0.0.1:8125", config.Me.Name)
 	if err != nil {
 		log.Panicln("Failed to connect statsd server:", err)
 	}
@@ -260,6 +260,7 @@ type ChainMap struct {
 
 type Configuration struct {
 	Me struct {
+		Name     string
 		Address  string
 		Password string
 	}
