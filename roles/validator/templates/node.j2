@@ -8,21 +8,18 @@ apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc
 processing_threads = {{ processor_count }}
 cors=["all"]
 
-# TODO: disable websockets
 [websockets]
-interface = "0.0.0.0"
+interface = "127.0.0.1"
 hosts = ["all"]
 origins = ["all"]
 apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
 disable = false
 
 [ipc]
-disable = true
+disable = false
 
 [ui]
-# TODO: remove interface replace with false
-interface = "0.0.0.0"
-disable = false
+disable = true
 
 [network]
 reserved_peers = "{{ home }}/bootnodes.txt"
@@ -32,10 +29,15 @@ discovery = false
 password = ["{{ home }}/node.pwd"]
 
 [mining]
+usd_per_tx = "0"
 engine_signer = "0x{{ account.stdout }}"
+min_gas_price = 1000000000
 tx_queue_size = 8192
 force_sealing = true
 reseal_on_txs = "none"
+
+[dapps]
+disable = true
 
 [misc]
 log_file = "{{ home }}/logs/parity.log"
