@@ -10,8 +10,8 @@ const secret = allConfig.agent_secret;
 
 let peers = [];
 
-let peerKeys = Object.keys(hostsFile.peer);
-let validatorKeys = Object.keys(hostsFile.validator);
+let peerKeys = Object.keys(hostsFile.peer || {});
+let validatorKeys = Object.keys(hostsFile.validator || {});
 
 for (let i = 0; i < peerKeys.length; i++) {
     let s = peerKeys[i];
@@ -32,10 +32,20 @@ if (!count) {
 
 console.log('Count is', count);
 
+let rpcType = "http";
+let rpcTypeArg = process.argv[3];
+if (rpcTypeArg) {
+    if (["http", "ws", "ipc"].indexOf(rpcTypeArg) >= 0) {
+        rpcType = rpcTypeArg;
+    }
+}
+
 let urls = [];
 
 peers.forEach((p) => {
-    urls.push(`http://${p}:8080/orders?sendtx=${count}&secret=${secret}`);
+    // urls.push(`http://${p}:8080/ethSignAndSend?count=${count}&secret=${secret}`);
+    urls.push(
+        `http://${p}:8080/ethSendRaw?count=${count}&secret=${secret}&rpcType=${rpcType}`);
 });
 
 console.log("Urls are\n", urls.join("\n"));
