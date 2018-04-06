@@ -25,8 +25,6 @@ agent-linux:
 	$ docker run -v $(ROOT_DIR)/agent:/usr/src/agent -w /usr/src/agent \
 	 -e GOOS=linux -e GOARCH=amd64 mygolang:1.10 go build -v
 
-#	GOOS=linux GOARCH=amd64 go build -o agent/agent agent/agent.go
-
 agent-deploy:
 	ansible-playbook -i hosts.txt agent.yml
 
