@@ -8,8 +8,14 @@
     "password": "{{ name }}"
 {% endif %}
   },
-  "rpcEndpoint": "127.0.0.1:8545",
+  "endpoints": {
+    "rpc": "127.0.0.1:8545",
+    "ws": "ws://127.0.0.1:8546",
+    "ipc": "/tmp/parity.ipc"
+  },
+  "peerKey": "{{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/peer.key",
+  "logs": "{{ home }}/logs/agent.log",
   "secret": "{{ agent_secret }}",
-  "txLimit": 3000,
+  "txLimit": 100000,
   "workersCount": {{ processor_count * 2 }}
 }
