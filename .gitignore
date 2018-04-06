@@ -6,3 +6,4 @@ map.json
 config.json
 *.retry
 agent/agent
+remote
