@@ -2,21 +2,23 @@
 chain = "{{ home }}/spec.json"
 
 [rpc]
-# TODO: replace with 127.0.0.1
-interface = "0.0.0.0"
+disable = false
+interface = "127.0.0.1"
 apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
 processing_threads = {{ processor_count }}
 cors=["all"]
 
 [websockets]
+disable = false
 interface = "127.0.0.1"
 hosts = ["all"]
 origins = ["all"]
 apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
-disable = false
 
 [ipc]
 disable = false
+apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
+path = "/tmp/parity.ipc"
 
 [ui]
 disable = true
@@ -32,6 +34,7 @@ password = ["{{ home }}/node.pwd"]
 usd_per_tx = "0"
 engine_signer = "0x{{ account.stdout }}"
 min_gas_price = 1000000000
+gas_floor_target = "67000000"
 tx_queue_size = 8192
 force_sealing = true
 reseal_on_txs = "none"
@@ -42,4 +45,4 @@ disable = true
 [misc]
 log_file = "{{ home }}/logs/parity.log"
 # Logging pattern (`<module>=<level>`, e.g. `own_tx=trace`).
-logging = "miner=trace,own_tx,tx_queue=trace"
+logging = "miner=info,own_tx,tx_queue=trace"

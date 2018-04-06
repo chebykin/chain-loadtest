@@ -8,10 +8,16 @@ processing_threads = {{ processor_count }}
 cors=["all"]
 
 [websockets]
-disable = true
+disable = false
+interface = "127.0.0.1"
+hosts = ["all"]
+origins = ["all"]
+apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
 
 [ipc]
-disable = true
+disable = false
+apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
+path = "/tmp/parity.ipc"
 
 [ui]
 disable = true
@@ -27,4 +33,4 @@ unlock = ["0x{{ account.stdout }}"]
 [misc]
 log_file = "{{ home }}/logs/parity.log"
 # Logging pattern (`<module>=<level>`, e.g. `own_tx=trace`).
-logging = "miner=trace,own_tx,tx_queue=trace"
+logging = "rpc,own_tx,tx_queue=trace"
