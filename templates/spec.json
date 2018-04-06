@@ -32,7 +32,7 @@
       }
     },
     "difficulty": "0x20000",
-    "gasLimit": "0x3FE56C0"
+    "gasLimit": "0x663BE0"
   },
   "accounts": {
     "0000000000000000000000000000000000000005": { "builtin": { "name": "modexp", "activate_at": "0x0", "pricing": { "modexp": { "divisor": 20 } } } },
