@@ -1,0 +1,48 @@
+---
+- name: Create external_txs folder
+  file:
+    path: "{{ home }}/external_txs"
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: 0755
+
+- name: checkEndpoints.js script
+  template:
+    src: "checkEndpoints.js"
+    dest: "{{ home }}/external_txs/checkEndpoints.js"
+    owner: ubuntu
+    group: ubuntu
+    mode: 0644
+
+- name: checkInterfaces.js script
+  template:
+    src: "checkInterfaces.js"
+    dest: "{{ home }}/external_txs/checkInterfaces.js"
+    owner: ubuntu
+    group: ubuntu
+    mode: 0644
+
+- name: package.json
+  template:
+    src: "package.json"
+    dest: "{{ home }}/external_txs/package.json"
+    owner: ubuntu
+    group: ubuntu
+    mode: 0644
+
+- name: map.json
+  copy:
+    src: "./tmp/latest/map.json"
+    dest: "{{ home }}/map.json"
+    owner: ubuntu
+    group: ubuntu
+    mode: 0644
+
+- name: validator-o peer key file
+  copy:
+    src: "./tmp/latest/vpeers/validator-0.json"
+    dest: "{{ home }}/external_txs/validator-0.json"
+    owner: ubuntu
+    group: ubuntu
+    mode: 0644

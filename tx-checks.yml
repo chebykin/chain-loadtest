@@ -1,0 +1,6 @@
+- name: Non-chain loadtest scripts
+  hosts: validator
+  gather_facts: no
+  remote_user: ubuntu
+  roles:
+    - tx-checks
