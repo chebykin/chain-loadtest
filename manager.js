@@ -5,7 +5,7 @@ const fs = require('fs'),
     fetch = require('node-fetch');
 
 const hostsFile = ini.parse(fs.readFileSync('./hosts.txt', 'utf-8'));
-const allConfig = YAML.load("./group_vars/all");
+const allConfig = YAML.load("./group_vars/all.yml");
 const secret = allConfig.agent_secret;
 
 let peers = [];
