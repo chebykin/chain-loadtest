@@ -5,7 +5,7 @@ YAML = require('yamljs');
 const time = new Date().getTime();
 const dir = `./tmp/${time}`;
 
-const allConfig = YAML.load("./group_vars/all");
+const allConfig = YAML.load("./group_vars/all.yml");
 const peersCount = allConfig['peers_count'];
 const validatorsCount = allConfig['validators_count'];
 
@@ -78,7 +78,7 @@ fs.createReadStream('./templates/local.toml').pipe(fs.createWriteStream(`./tmp/$
 console.log('Saving timestamp to all config ...');
 
 allConfig.timestamp = time;
-fs.writeFileSync("./group_vars/all", YAML.stringify(allConfig));
+fs.writeFileSync("./group_vars/all.yml", YAML.stringify(allConfig, 10));
 
 console.log('Creating latest symlink...');
 
