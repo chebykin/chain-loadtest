@@ -7,3 +7,4 @@ config.json
 *.retry
 agent/agent
 remote
+build
