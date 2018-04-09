@@ -17,10 +17,17 @@
   shell: "grep -oP '(?<=Public node URL: ).*' {{ home}}/logs/parity.log"
   register: enode
 
+- name: Remove bootnodes.txt
+  file:
+    state: absent
+    path: ./bootnodes.txt
+  delegate_to: localhost
+
 - name: Save enode address
   lineinfile:
     path: ./bootnodes.txt
     line: "{{ enode.stdout }}"
+    create: yes
   delegate_to: localhost
 
 - name: Replace bootnodes.txt at all hosts
