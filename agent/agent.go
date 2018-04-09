@@ -296,7 +296,6 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Peers count", len(chainMap.Peers))
-	//val := big.NewInt(0).Mul(big.NewInt(34), big.NewInt(1E16))
 
 	jobsCh := make(chan *types.Transaction)
 	resultsCh := make(chan sendResult)
@@ -313,9 +312,13 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Panicln("Unable to read validator key file:", err)
 	}
-	key, _ := keystore.DecryptKey([]byte(file), "vpeers/validator-0")
+	key, err := keystore.DecryptKey([]byte(file), config.Me.Password)
+	if err != nil {
+		log.Panic(err)
+	}
+	fmt.Println("Decoded key address", key.Address)
 
-	client, err := getClient("http://127.0.0.1:8545")
+	client, err := getClient(fmt.Sprintf("http://%s", config.Endpoints.RPC))
 	if err != nil {
 		log.Panic(err)
 	}
@@ -329,10 +332,10 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 	signer := types.NewEIP155Signer(big.NewInt(int64(15054)))
 
 	for i := 0; i < count; i++ {
-		//fmt.Println(i)
 		tx := types.NewTransaction(nonce, common.StringToAddress(chainMap.Peers[0]),
 			big.NewInt(1E16),
 			uint64(21000), big.NewInt(1E9), []byte(""))
+
 
 		signed_tx, _ := types.SignTx(tx, signer, key.PrivateKey)
 		txs[i] = signed_tx
@@ -400,7 +403,7 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 }
 
 func ethSendRawWorker(jobs <-chan *types.Transaction, results chan<- sendResult) {
-	client, err := getClient("http://127.0.0.1:8545")
+	client, err := getClient(fmt.Sprintf("http://%s", config.Endpoints.RPC))
 	if err != nil {
 		log.Panic(err)
 	}
