@@ -30,3 +30,5 @@ agent-deploy:
 
 agent-update: agent-clean agent-linux agent-deploy
 
+tx-queue:
+	cd txqueue && python -m http.server 9000
