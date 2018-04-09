@@ -4,9 +4,6 @@ const fs = require('fs');
 
 const allConfig = YAML.load("./group_vars/all.yml");
 
-assert.ok(typeof process.env.DO_API_TOKEN === 'string');
-assert.ok(process.env.DO_API_TOKEN.length > 0);
-
 function generateValidator2RegionMap(inputMap) {
     assert.ok(Array.isArray(inputMap));
     return new Promise((resolve, reject) => {
