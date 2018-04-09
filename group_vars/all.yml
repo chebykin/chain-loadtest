@@ -1,26 +1,64 @@
-do_region: ams3
 do_image_id: ubuntu-17-10-x64
 do_size: s-1vcpu-1gb
-peers_count: 2
-validators_count: 3
-# timestamp is managed by app.js script
-timestamp: 1523034232393
+do_key_id: 19020824
+peers_count: 5
+validators_count: 15
+timestamp: 1523269953014
 map:
-    - ams3:
-      peers:
-            - peer-0
+    -
+        region: ams3
+        peers:
             - peer-1
-      validators:
-            - validator-0
+        validators:
             - validator-2
-    lon1:
+            - validator-6
+    -
+        region: lon1
         peers:
             - peer-2
         validators:
             - validator-1
+    -
+        region: fra1
+        peers: []
+        validators:
+            - validator-3
+            - validator-4
+    -
+        region: nyc1
+        peers: []
+        validators:
+            - validator-11
+            - validator-14
+    -
+        region: sfo2
+        peers:
+            - peer-3
+        validators:
+            - validator-5
+    -
+        region: tor1
+        peers:
+            - peer-0
+        validators:
+            - validator-0
+            - validator-10
+            - validator-13
+    -
+        region: blr1
+        peers: []
+        validators:
+            - validator-7
+            - validator-9
+    -
+        region: sgp1
+        peers:
+            - peer-4
+        validators:
+            - validator-8
+            - validator-12
 home: /home/ubuntu
 username: ubuntu
 processor_count: 1
 genesis_network_name: PoaLoadTest
 agent_secret: check
-
