@@ -2,17 +2,17 @@
 chain = "{{ home }}/spec.json"
 
 [rpc]
-interface = "127.0.0.1"
+interface = "0.0.0.0"
 apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
 processing_threads = {{ processor_count }}
 cors=["all"]
 
 [websockets]
 disable = false
-interface = "127.0.0.1"
+interface = "0.0.0.0"
 hosts = ["all"]
 origins = ["all"]
-apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
+apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc", "pubsub"]
 
 [ipc]
 disable = false

@@ -3,7 +3,7 @@ chain = "{{ home }}/spec.json"
 
 [rpc]
 disable = false
-interface = "127.0.0.1"
+interface = "0.0.0.0"
 apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
 processing_threads = {{ processor_count }}
 cors=["all"]
@@ -34,7 +34,7 @@ password = ["{{ home }}/node.pwd"]
 usd_per_tx = "0"
 engine_signer = "0x{{ account.stdout }}"
 min_gas_price = 1000000000
-gas_floor_target = "67000000"
+gas_floor_target = "670000000"
 tx_queue_size = 8192
 force_sealing = true
 reseal_on_txs = "none"
