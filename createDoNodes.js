@@ -5,11 +5,13 @@ const assert = require('assert');
 const fs = require('fs');
 
 const allConfig = YAML.load("./group_vars/all.yml");
+const map = YAML.load(`./maps/${allConfig.map}.yml`);
 
 assert.ok(typeof process.env.DO_API_TOKEN === 'string');
 assert.ok(process.env.DO_API_TOKEN.length > 0);
 
 function createNodes(map) {
+    console.log("Creating nodes...");
     assert.ok(Array.isArray(map));
     return new Promise((resolve, reject) => {
         async.each(map, (region, callback) => {
@@ -35,9 +37,9 @@ function createNodes(map) {
                         'Content-Type': 'application/json'
                     }
                 })
-                .then(res => {
+                .then(async(res) => {
                     if (res.status !== 202) {
-                        console.log('Bad response (ignored)', res);
+                        console.log('Bad response (ignored)', await res.text());
                     }
                     callback();
                 })
@@ -58,7 +60,7 @@ function fetchIPs() {
 
     return new Promise((resolve, reject) => {
         console.log("Fetching droplet IPs...");
-        fetch(`https://api.digitalocean.com/v2/droplets?tag_name=tn-${allConfig.timestamp}`,
+        fetch(`https://api.digitalocean.com/v2/droplets?tag_name=tn-${allConfig.timestamp}&per_page=50`,
             {
                 method: 'get',
                 headers: {
@@ -72,12 +74,14 @@ function fetchIPs() {
                     if (droplet.name.startsWith("validator")) {
                         validators.push({
                             name: droplet.name,
-                            ip: droplet.networks.v4[0].ip_address
+                            ip: droplet.networks.v4[0].ip_address,
+                            region: droplet.region.slug
                         })
                     } else if (droplet.name.startsWith("peer")) {
                         peers.push({
                             name: droplet.name,
-                            ip: droplet.networks.v4[0].ip_address
+                            ip: droplet.networks.v4[0].ip_address,
+                            region: droplet.region.slug
                         })                    } else {
                         reject(new Error(`Unexpected name: ${droplet.name}`))
                     }
@@ -110,7 +114,11 @@ function fetchIPs() {
                 });
 
                 fs.writeFileSync("./hosts.txt", content);
-                console.log('Generating hosts.txt done')
+                fs.writeFileSync("./tmp/latest/hostsMap.json", JSON.stringify({
+                    peers,
+                    validators
+                }), null, 2);
+                console.log('Generating hosts.txt done');
             })
             .catch(reject)
     });
@@ -121,7 +129,7 @@ function sleep(ms) {
 }
 
 (async () => {
-    await createNodes(allConfig.map);
+    await createNodes(map);
     console.log('Sleep 30 seconds...');
     await sleep(30 * 1000);
     await fetchIPs();

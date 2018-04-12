@@ -3,6 +3,7 @@ const assert = require('assert');
 const fs = require('fs');
 
 const allConfig = YAML.load("./group_vars/all.yml");
+const map = YAML.load(`./maps/${allConfig.map}.yml`);
 
 function generateValidator2RegionMap(inputMap) {
     assert.ok(Array.isArray(inputMap));
@@ -32,10 +33,13 @@ function generateValidator2RegionMap(inputMap) {
             let v = validators[k];
             outputMap[v.address] = `${v.region} - ${v.name}`
         });
+        fs.writeFileSync("./tmp/latest/elMap.json", JSON.stringify(outputMap, null, 2));
+
         console.log(outputMap);
         resolve()
     });
 }
+
 (async () => {
-    await generateValidator2RegionMap(allConfig.map);
+    await generateValidator2RegionMap(map);
 })();
