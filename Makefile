@@ -32,3 +32,15 @@ agent-update: agent-clean agent-linux agent-deploy
 
 tx-queue:
 	cd txqueue && node server.js
+
+configs:
+	node app.js
+	node elMap.js
+
+droplets:
+	node createNodes.js
+
+chain:
+	ansible-playbook -i hosts.txt chain.yml
+
+bootstrap-network: configs droplets chain
