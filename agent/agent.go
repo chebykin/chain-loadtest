@@ -369,7 +369,7 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 		rand.Read(payload)
 		tx := types.NewTransaction(nonce, common.BytesToAddress([]byte(chainMap.Peers[0])),
 			big.NewInt(1E16),
-			uint64(50000), big.NewInt(1E9), payload)
+			uint64(500000), big.NewInt(1E9), payload)
 
 		signed_tx, _ := types.SignTx(tx, signer, key.PrivateKey)
 		txs[i] = signed_tx
