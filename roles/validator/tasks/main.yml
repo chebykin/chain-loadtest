@@ -23,6 +23,10 @@
     group: "{{ username }}"
     mode: 0644
 
+- name: Fetch core count
+  shell: "cat /proc/cpuinfo | grep processor | wc -l"
+  register: core_count
+
 - name: Fetch mining address from key file
   shell: "grep -oP '(?<=\"address\":\")[^\"]*' {{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/validator.key"
   register: account

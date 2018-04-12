@@ -18,5 +18,5 @@
   "tickerLog": "{{ home }}/logs/agent-ticks.log",
   "secret": "{{ agent_secret }}",
   "txLimit": 100000,
-  "workersCount": {{ processor_count * 5 }}
+  "workersCount": {{ (core_count.stdout | int) * 5 }}
 }
