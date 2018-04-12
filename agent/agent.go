@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -364,9 +365,11 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 	signer := types.NewEIP155Signer(big.NewInt(int64(15054)))
 
 	for i := 0; i < count; i++ {
+		payload := make([]byte, 200)
+		rand.Read(payload)
 		tx := types.NewTransaction(nonce, common.BytesToAddress([]byte(chainMap.Peers[0])),
 			big.NewInt(1E16),
-			uint64(21000), big.NewInt(1E9), []byte(""))
+			uint64(50000), big.NewInt(1E9), payload)
 
 		signed_tx, _ := types.SignTx(tx, signer, key.PrivateKey)
 		txs[i] = signed_tx
