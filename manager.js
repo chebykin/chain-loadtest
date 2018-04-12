@@ -44,21 +44,26 @@ let urls = [];
 
 peers.forEach((p) => {
     // urls.push(`http://${p}:8080/ethSignAndSend?count=${count}&secret=${secret}`);
-    urls.push(
-        `http://${p}:8080/ethSendRaw?count=${count}&secret=${secret}&rpcType=${rpcType}`);
+    urls.push({
+        ip: p,
+        url: `http://${p}:8080/ethSendRaw?count=${count}&secret=${secret}&rpcType=${rpcType}`
+    });
 });
 
-console.log("Urls are\n", urls.join("\n"));
+console.log("Urls are\n", urls.map(u => u.url).join("\n"));
 
 let tasks = [];
 
 urls.forEach((u) => {
     tasks.push((callback) => {
-        fetch(u)
+        console.time(u.ip);
+        fetch(u.url)
             .then((r) => {
+                console.timeEnd(u.ip);
                 callback(null, r);
             })
             .catch((e) => {
+                console.timeEnd(u.ip);
                 callback(e, null)
             })
     })
@@ -66,5 +71,7 @@ urls.forEach((u) => {
 
 (async function()  {
     // TODO: in case of error it just exits, no debug info
-    await async.parallel(tasks)
+    await async.parallel(tasks, e => {
+        console.log('error', e);
+    })
 })();
