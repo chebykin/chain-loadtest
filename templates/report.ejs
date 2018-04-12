@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Report <%= name %></title>
+</head>
+<body>
+<div class="container">
+    <h1><%= name %></h1>
+    <div class="row">
+        <div class="col-sm-6">
+            <table class="table table-sm">
+                <h4>Performance</h4>
+                <table class="table-sm table-bordered">
+                    <tr>
+                        <td>Total sent tx:</td>
+                        <td>30000</td>
+                    </tr>
+                    <tr>
+                        <td>Avg Time (seconds):</td>
+                        <td><%= avg.seconds %></td>
+                    </tr>
+                    <tr>
+                        <td>Avg Max tx per block:</td>
+                        <td><%= avg.maxTxPerBlock %></td>
+                    </tr>
+                    <tr>
+                        <td>Avg Avg tx per block:</td>
+                        <td><%= avg.avgPerBlock%></td>
+                    </tr>
+                    <tr>
+                        <td>Avg Avg tx per second:</td>
+                        <td><%= avg.avgPerSecond %></td>
+                    </tr>
+                </table>
+            </table>
+        </div>
+        <div class="col-sm-6">
+            <h4>Nodes Configuration</h4>
+            <table class="table table-stripped table-hover table-sm">
+                <% Object.keys(hardware).forEach(function(k) { %>
+                <tr>
+                    <td><%= k %></td>
+                    <td><%= hardware[k] %></td>
+                </tr>
+                <% }) %>
+            </table>
+        </div>
+    </div>
+<% runs.forEach(function(run) {%>
+    <div class="row lt-run">
+        <div class="col-sm-6">
+            <h3><%= run.name %></h3>
+            <table class="table table-stripped table-hover table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Block #</th>
+                    <th scope="col">Validator</th>
+                    <th scope="col">#txs</th>
+                    <th scope="col">Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% run.blocks.forEach(function(block) { %>
+                <tr>
+                    <th scope="row"><%= block.n %></th>
+                    <td title="<%= block.a%>"><%= block.m %></td>
+                    <td><%= block.tC %></td>
+                    <td><%= block.t %></td>
+                </tr>
+                <% }); %>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-6">
+            <h4>Statistics</h4>
+            <table class="table-sm table-bordered">
+                <tr>
+                    <td>Total tx:</td>
+                    <td>30000</td>
+                </tr>
+                <tr>
+                    <td>Time (seconds):</td>
+                    <td><%= run.time %></td>
+                </tr>
+                <tr>
+                    <td>Max tx per block:</td>
+                    <td><%= run.max %></td>
+                </tr>
+                <tr>
+                    <td>Avg tx per block:</td>
+                    <td><%= run.avgPerBlock %></td>
+                </tr>
+                <tr>
+                    <td>Avg tx per second:</td>
+                    <td><%= run.avgPerSecond %></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+<% }) %>
+</div>
+
+</body>
+</html>
