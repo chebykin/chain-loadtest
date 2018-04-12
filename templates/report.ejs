@@ -13,7 +13,7 @@
 <div class="container">
     <h1><%= name %></h1>
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-3">
             <table class="table table-sm">
                 <h4>Performance</h4>
                 <table class="table-sm table-bordered">
@@ -38,6 +38,23 @@
                         <td><%= avg.avgPerSecond %></td>
                     </tr>
                 </table>
+            </table>
+        </div>
+        <div class="col-sm-3">
+            <h4>DO config</h4>
+            <table class="table-sm table-bordered">
+                <tr>
+                    <td>Image</td>
+                    <td><%= digitalocean.image %></td>
+                </tr>
+                <tr>
+                    <td>Size</td>
+                    <td><%= digitalocean.size %></td>
+                </tr>
+                <tr>
+                    <td>Cores</td>
+                    <td><%= digitalocean.coresCount %></td>
+                </tr>
             </table>
         </div>
         <div class="col-sm-6">

@@ -68,7 +68,5 @@ async.waterfall([
         hardware: Object.keys(cpusYaml).sort().reduce((r, k) => (r[k] = cpusYaml[k], r), {})
     };
 
-    // TODO: parse cpuinfo.txt
-
     fs.writeFileSync(`./data/${name}.json`, JSON.stringify(data, null, 2));
 });

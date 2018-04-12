@@ -18,6 +18,7 @@ let elMap = JSON.parse(fs.readFileSync("./tmp/latest/elMap.json"));
 
 let renderData = {
     name,
+    digitalocean: data.do,
     hardware: data.hardware,
     runs: []
 };
@@ -65,4 +66,4 @@ renderData.avg = {
 };
 
 let html = ejs.render(template, renderData);
-fs.writeFileSync("./docs/index.html", html);
+fs.writeFileSync(`./docs/${name}.html`, html);
