@@ -1,0 +1,27 @@
+-
+    region: ams3
+    peers:
+        - peer-0
+    validators:
+        - validator-2
+        - validator-1
+-
+    region: lon1
+    peers:
+        - peer-1
+    validators:
+        - validator-0
+-
+    region: fra1
+    peers:
+        - peer-2
+    validators:
+        - validator-3
+        - validator-4
+-
+    region: nyc1
+    peers:
+        - peer-3
+    validators:
+        - validator-5
+        - validator-6

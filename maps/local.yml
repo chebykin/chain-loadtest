@@ -1,0 +1,9 @@
+-
+    region: fra1
+    peers:
+        - peer-0
+        - peer-1
+    validators:
+        - validator-1
+        - validator-2
+        - validator-0
