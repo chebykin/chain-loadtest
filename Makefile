@@ -38,7 +38,7 @@ configs:
 	node elMap.js
 
 droplets:
-	node createNodes.js
+	node createDoNodes.js
 
 chain:
 	ansible-playbook -i hosts.txt chain.yml
