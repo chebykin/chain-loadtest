@@ -130,7 +130,7 @@ function sleep(ms) {
 
 (async () => {
     await createNodes(map);
-    console.log('Sleep 30 seconds...');
-    await sleep(30 * 1000);
+    console.log('Sleep 60 seconds...');
+    await sleep(60 * 1000);
     await fetchIPs();
 })();
