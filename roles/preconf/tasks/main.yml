@@ -2,6 +2,17 @@
 - name: 'Install python2'
   raw: sudo apt-get -y install python-simplejson
 
+- name: Collect CPU info
+  shell: "lscpu | sed -nr '/Model name/ s/.*:\\s*(.* @ .*)/\\1/p'"
+  register: cpu_info
+
+- name: Write CPU info
+  lineinfile:
+    path: ./tmp/latest/cpuinfo.txt
+    line: "{{ name }}: {{ cpu_info.stdout }}"
+    create: yes
+  delegate_to: localhost
+
 - name: Upgrade packages
   apt:
     upgrade: yes

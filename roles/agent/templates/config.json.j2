@@ -15,7 +15,8 @@
   },
   "peerKey": "{{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/peer.key",
   "logs": "{{ home }}/logs/agent.log",
+  "tickerLog": "{{ home }}/logs/agent-ticks.log",
   "secret": "{{ agent_secret }}",
   "txLimit": 100000,
-  "workersCount": {{ processor_count * 2 }}
+  "workersCount": {{ processor_count * 5 }}
 }

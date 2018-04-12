@@ -1,7 +1,7 @@
 ---
 - name: Install parity
   apt:
-    deb: http://d1h4xl4cr1h0mo.cloudfront.net/v1.10.0/x86_64-unknown-linux-gnu/parity_1.10.0_ubuntu_amd64.deb
+    deb: "{{ parity_deb }}"
 
 - name: install parity service
   template: src=parity.service.j2 dest=/etc/systemd/system/parity.service owner=root group=root mode=0755

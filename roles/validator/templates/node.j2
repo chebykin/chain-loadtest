@@ -10,7 +10,7 @@ cors=["all"]
 
 [websockets]
 disable = false
-interface = "127.0.0.1"
+interface = "0.0.0.0"
 hosts = ["all"]
 origins = ["all"]
 apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
@@ -35,9 +35,10 @@ usd_per_tx = "0"
 engine_signer = "0x{{ account.stdout }}"
 min_gas_price = 1000000000
 gas_floor_target = "670000000"
-tx_queue_size = 8192
+tx_queue_size = 65536
 force_sealing = true
 reseal_on_txs = "none"
+notify_work = ["http://localhost:8080/workpackage"]
 
 [dapps]
 disable = true
@@ -45,4 +46,4 @@ disable = true
 [misc]
 log_file = "{{ home }}/logs/parity.log"
 # Logging pattern (`<module>=<level>`, e.g. `own_tx=trace`).
-logging = "miner=info,own_tx,tx_queue=trace"
+logging = "miner=info"

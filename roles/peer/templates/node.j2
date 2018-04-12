@@ -30,7 +30,10 @@ discovery = false
 password = ["{{ home }}/node.pwd"]
 unlock = ["0x{{ account.stdout }}"]
 
+[mining]
+tx_queue_size = 65536
+
 [misc]
 log_file = "{{ home }}/logs/parity.log"
 # Logging pattern (`<module>=<level>`, e.g. `own_tx=trace`).
-logging = "rpc,own_tx,tx_queue=trace"
+logging = ""
