@@ -2,6 +2,7 @@
 let Web3 = require('web3');
 let async = require('async');
 let fs = require('fs');
+const YAML = require('yamljs');
 
 let name = process.argv[2];
 
@@ -10,8 +11,9 @@ if (!name) {
     process.exit(1);
 }
 
-
+const allConfig = YAML.load("./group_vars/all.yml");
 let hostsMap = JSON.parse(fs.readFileSync("./tmp/latest/hostsMap.json"));
+const cpusYaml = YAML.load("./tmp/latest/cpuinfo.txt");
 
 const provider = new Web3.providers.HttpProvider(`http://${hostsMap.peers[1].ip}:8545`);
 let web3 = new Web3();
@@ -56,7 +58,17 @@ async.waterfall([
         }
     }
 
+    let data = {
+        blocks,
+        do: {
+            size: allConfig.do_size,
+            coresCount: allConfig.processor_count,
+            image: allConfig.do_image_id
+        },
+        hardware: Object.keys(cpusYaml).sort().reduce((r, k) => (r[k] = cpusYaml[k], r), {})
+    };
+
     // TODO: parse cpuinfo.txt
 
-    fs.writeFileSync(`./data/${name}.json`, JSON.stringify({blocks}, null, 2));
+    fs.writeFileSync(`./data/${name}.json`, JSON.stringify(data, null, 2));
 });
