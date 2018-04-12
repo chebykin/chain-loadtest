@@ -25,7 +25,7 @@
   remote_user: root
   roles:
     - parity
-    - monitoring
+#    - monitoring
 
 - name: Configure agent
   hosts: all
