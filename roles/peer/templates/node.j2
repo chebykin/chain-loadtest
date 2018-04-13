@@ -4,7 +4,7 @@ chain = "{{ home }}/spec.json"
 [rpc]
 interface = "0.0.0.0"
 apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
-processing_threads = {{ processor_count }}
+processing_threads = {{ core_count.stdout | int }}
 cors=["all"]
 
 [websockets]
