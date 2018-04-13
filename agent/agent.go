@@ -116,6 +116,7 @@ func server() {
 		Addr:         addr,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  100 * time.Second,
+		IdleTimeout:  100 * time.Second,
 	}
 
 	log.Println("Listening at", addr)
@@ -369,7 +370,7 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 		rand.Read(payload)
 		tx := types.NewTransaction(nonce, common.BytesToAddress([]byte(chainMap.Peers[0])),
 			big.NewInt(1E16),
-			uint64(500000), big.NewInt(1E9), payload)
+			uint64(50*1000*1000), big.NewInt(1E9), payload)
 
 		signed_tx, _ := types.SignTx(tx, signer, key.PrivateKey)
 		txs[i] = signed_tx
