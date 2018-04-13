@@ -25,7 +25,7 @@ $(function () {
     let subscription = web3.eth.subscribe('newBlockHeaders')
         .on("data", function (block) {
 
-            web3.eth.getBlock(block.number)
+            web3.eth.getBlock(block.number, false)
                 .then((block) => {
                     let now = new Date(block.timestamp * 1000);
                     let time = `${now.getUTCHours()}:${now.getUTCMinutes()}:${now.getUTCSeconds()}`;
