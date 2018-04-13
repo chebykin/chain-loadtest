@@ -15,6 +15,10 @@
     group: "{{ username }}"
     mode: 0644
 
+- name: Fetch core count
+  shell: "cat /proc/cpuinfo | grep processor | wc -l"
+  register: core_count
+
 - name: Fetch address from key file
   shell: "grep -oP '(?<=\"address\":\")[^\"]*' {{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/peer.key"
   register: account
