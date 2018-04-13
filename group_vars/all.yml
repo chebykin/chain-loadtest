@@ -1,13 +1,13 @@
-do_image_id: ubuntu-17-10-x64
+do_image_id: ubuntu-16-04-x64
 do_size: c-4
 do_key_id: 19020824
-peers_count: 2
-validators_count: 3
+peers_count: 5
+validators_count: 5
 timestamp: 1523458869270
 map: local
 home: /home/ubuntu
 username: ubuntu
-processor_count: 1
+processor_count: 4
 genesis_network_name: PoaLoadTest
 agent_secret: check
 parity_deb: 'http://d1h4xl4cr1h0mo.cloudfront.net/v1.9.5/x86_64-unknown-linux-gnu/parity_1.9.5_ubuntu_amd64.deb'
