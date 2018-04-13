@@ -1,0 +1,22 @@
+-
+    region: nyc1
+    peers:
+        - peer-0
+        - peer-3
+    validators:
+        - validator-0
+-
+    region: nyc3
+    peers:
+        - peer-2
+    validators:
+        - validator-1
+        - validator-3
+-
+    region: sfo2
+    peers:
+        - peer-1
+        - peer-4
+    validators:
+        - validator-2
+        - validator-4
