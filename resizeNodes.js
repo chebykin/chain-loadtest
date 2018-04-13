@@ -39,7 +39,7 @@ function fetchIPs() {
                         },
                         body: JSON.stringify({
                             "type": "resize",
-                            "disk": true,
+                            "disk": false,
                             "size": allConfig.do_size
                         })
 
