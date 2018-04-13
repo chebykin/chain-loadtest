@@ -65,7 +65,8 @@ async.waterfall([
             coresCount: allConfig.processor_count,
             image: allConfig.do_image_id
         },
-        hardware: Object.keys(cpusYaml).sort().reduce((r, k) => (r[k] = cpusYaml[k], r), {})
+        hardware: Object.keys(cpusYaml).sort().reduce((r, k) => (r[k] = cpusYaml[k], r), {}),
+        chainMap: hostsMap
     };
 
     fs.writeFileSync(`./data/${name}.json`, JSON.stringify(data, null, 2));
