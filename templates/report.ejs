@@ -18,23 +18,15 @@
                 <h4>Performance</h4>
                 <table class="table-sm table-bordered">
                     <tr>
-                        <td>Total sent tx:</td>
-                        <td>30000</td>
-                    </tr>
-                    <tr>
-                        <td>Avg Time (seconds):</td>
-                        <td><%= avg.seconds %></td>
-                    </tr>
-                    <tr>
-                        <td>Avg Max tx per block:</td>
+                        <td>Max tx per block:</td>
                         <td><%= avg.maxTxPerBlock %></td>
                     </tr>
                     <tr>
-                        <td>Avg Avg tx per block:</td>
+                        <td>Avg tx per block:</td>
                         <td><%= avg.avgPerBlock%></td>
                     </tr>
                     <tr>
-                        <td>Avg Avg tx per second:</td>
+                        <td>Avg tx per second:</td>
                         <td><%= avg.avgPerSecond %></td>
                     </tr>
                 </table>
@@ -72,7 +64,7 @@
     </div>
 <% runs.forEach(function(run) {%>
     <div class="row lt-run">
-        <div class="col-sm-6">
+        <div class="col-sm-8">
             <h3><%= run.name %></h3>
             <table class="table table-stripped table-hover table-sm">
                 <thead>
@@ -95,12 +87,16 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <h4>Statistics</h4>
             <table class="table-sm table-bordered">
                 <tr>
-                    <td>Total tx:</td>
-                    <td>30000</td>
+                    <td>Tx sent per node:</td>
+                    <td><%= run.perNode %> </td>
+                </tr>
+                <tr>
+                    <td>Total tx sent:</td>
+                    <td><%= run.totalSent %></td>
                 </tr>
                 <tr>
                     <td>Time (seconds):</td>
@@ -117,6 +113,14 @@
                 <tr>
                     <td>Avg tx per second:</td>
                     <td><%= run.avgPerSecond %></td>
+                </tr>
+                <tr>
+                    <td>Blocks range:</td>
+                    <td><%= run.start - 1 %> - <%= run.end %></td>
+                </tr>
+                <tr>
+                    <td>Blocks count:</td>
+                    <td><%= run.end - run.start + 1%></td>
                 </tr>
             </table>
         </div>

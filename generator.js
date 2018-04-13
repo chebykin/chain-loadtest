@@ -8,8 +8,6 @@ if (!name) {
 let ejs = require('ejs');
 let fs = require('fs');
 
-const TX_NUM = 30000;
-
 let template = fs.readFileSync("./templates/report.ejs", "utf-8");
 let data = JSON.parse(fs.readFileSync(`./aura-loadtest-results/data/${name}.json`));
 
@@ -30,31 +28,35 @@ let totalAvgPerBlock = 0;
 let totalAvgPerSecond = 0;
 
 for (let run of data.runs) {
-    run.blocks = [];
-    run.time = data.blocks[run.end].t - data.blocks[run.start - 1].t;
-    run.max = 0;
+    for (let subRun of run.subRuns) {
+        subRun.perNode = run.perNode;
+        subRun.totalSent = run.perNode * Object.keys(data.chainMap).length;
+        subRun.blocks = [];
+        subRun.time = data.blocks[subRun.end].t - data.blocks[subRun.start - 1].t;
+        subRun.max = 0;
 
-    run.avgPerBlock = Math.round(TX_NUM / (run.end - run.start + 1));
-    run.avgPerSecond = Math.round(TX_NUM/run.time);
+        subRun.avgPerBlock = Math.round(subRun.totalSent / (subRun.end - subRun.start + 1));
+        subRun.avgPerSecond = Math.round(subRun.totalSent / subRun.time);
 
-    for (let i = run.end + 1; i >= run.start - 1; i--) {
-        let b = data.blocks[i];
-        b.m = elMap[b.a];
+        for (let i = subRun.end + 1; i >= subRun.start - 1; i--) {
+            let b = data.blocks[i];
+            b.m = elMap[b.a];
 
-        if (b.tC > run.max) {
-            run.max = b.tC
+            if (b.tC > subRun.max) {
+                subRun.max = b.tC
+            }
+
+            subRun.blocks.push(b);
         }
 
-        run.blocks.push(b);
+        // TODO: calculate summary
+        totalSeconds += subRun.time;
+        totalMaxTxPerBlock.push(subRun.max);
+        totalAvgPerBlock += subRun.avgPerBlock;
+        totalAvgPerSecond += subRun.avgPerSecond;
+
+        renderData.runs.push(subRun);
     }
-
-    // TODO: calculate summary
-    totalSeconds += run.time;
-    totalMaxTxPerBlock.push(run.max);
-    totalAvgPerBlock += run.avgPerBlock;
-    totalAvgPerSecond += run.avgPerSecond;
-
-    renderData.runs.push(run);
 }
 
 let c = data.runs.length;
