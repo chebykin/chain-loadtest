@@ -99,6 +99,14 @@
                     <td><%= run.totalSent %></td>
                 </tr>
                 <tr>
+                    <td>Total tx mined:</td>
+                    <td><%= run.totalMined %></td>
+                </tr>
+                <tr>
+                    <td>Lost:</td>
+                    <td><%= run.totalSent - run.totalMined %></td>
+                </tr>
+                <tr>
                     <td>Time (seconds):</td>
                     <td><%= run.time %></td>
                 </tr>

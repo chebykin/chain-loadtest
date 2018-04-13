@@ -37,13 +37,15 @@ for (let run of data.runs) {
 
         subRun.avgPerBlock = Math.round(subRun.totalSent / (subRun.end - subRun.start + 1));
         subRun.avgPerSecond = Math.round(subRun.totalSent / subRun.time);
+        subRun.totalMined = 0;
 
         for (let i = subRun.end + 1; i >= subRun.start - 1; i--) {
             let b = data.blocks[i];
             b.m = elMap[b.a];
+            subRun.totalMined += b.tC;
 
             if (b.tC > subRun.max) {
-                subRun.max = b.tC
+                subRun.max = b.tC;
             }
 
             subRun.blocks.push(b);
