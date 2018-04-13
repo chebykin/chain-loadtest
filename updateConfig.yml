@@ -1,0 +1,51 @@
+- name: Update peers config
+  hosts: peer
+  gather_facts: no
+  remote_user: ubuntu
+  tasks:
+
+    - name: Fetch core count
+      shell: "cat /proc/cpuinfo | grep processor | wc -l"
+      register: core_count
+
+    - name: Fetch address from key file
+      shell: "grep -oP '(?<=\"address\":\")[^\"]*' {{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/peer.key"
+      register: account
+
+    - name: Copy node.toml
+      template:
+        src: "./roles/peer/templates/node.j2"
+        dest: ~{{ username }}/node.toml
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: 0644
+
+- name: Update validators config
+  hosts: validator
+  gather_facts: no
+  remote_user: ubuntu
+  tasks:
+
+    - name: Fetch core count
+      shell: "cat /proc/cpuinfo | grep processor | wc -l"
+      register: core_count
+
+    - name: Fetch mining address from key file
+      shell: "grep -oP '(?<=\"address\":\")[^\"]*' {{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/validator.key"
+      register: account
+
+    - name: Copy node.toml
+      template:
+        src: "./roles/validator/templates/node.j2"
+        dest: ~{{ username }}/node.toml
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: 0644
+
+- name: Parity
+  hosts: all
+  gather_facts: no
+  remote_user: root
+  tasks:
+    - name: Restart parity
+      service: name=parity.service state=restarted
