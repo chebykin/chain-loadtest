@@ -16,6 +16,7 @@ let elMap = JSON.parse(fs.readFileSync("./tmp/latest/elMap.json"));
 
 let renderData = {
     name,
+    parity: data.parity,
     digitalocean: data.do,
     hardware: data.hardware,
     chainMap: data.chainMap,

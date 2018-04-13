@@ -72,7 +72,8 @@ async.waterfall([
             image: allConfig.do_image_id
         },
         hardware: Object.keys(cpusYaml).sort().reduce((r, k) => (r[k] = cpusYaml[k], r), {}),
-        chainMap: map
+        chainMap: map,
+        parity: allConfig.parity_deb
     };
 
     fs.writeFileSync(`./aura-loadtest-results/data/${name}.json`, JSON.stringify(data, null, 2));
