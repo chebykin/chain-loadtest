@@ -57,7 +57,9 @@ let tasks = [];
 urls.forEach((u) => {
     tasks.push((callback) => {
         console.time(u.ip);
-        fetch(u.url)
+        fetch(u.url, {
+            timeout: 100 * 1000,
+        })
             .then((r) => {
                 console.timeEnd(u.ip);
                 callback(null, r);
