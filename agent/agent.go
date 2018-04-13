@@ -115,7 +115,7 @@ func server() {
 		Handler:      r,
 		Addr:         addr,
 		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  20 * time.Second,
+		ReadTimeout:  100 * time.Second,
 	}
 
 	log.Println("Listening at", addr)
