@@ -11,7 +11,7 @@ let fs = require('fs');
 const TX_NUM = 30000;
 
 let template = fs.readFileSync("./templates/report.ejs", "utf-8");
-let data = JSON.parse(fs.readFileSync(`./data/${name}.json`));
+let data = JSON.parse(fs.readFileSync(`./aura-loadtest-results/data/${name}.json`));
 
 let hostsMap = JSON.parse(fs.readFileSync("./tmp/latest/hostsMap.json"));
 let elMap = JSON.parse(fs.readFileSync("./tmp/latest/elMap.json"));
@@ -67,4 +67,4 @@ renderData.avg = {
 };
 
 let html = ejs.render(template, renderData);
-fs.writeFileSync(`./docs/${name}.html`, html);
+fs.writeFileSync(`./aura-loadtest-results/docs/${name}.html`, html);

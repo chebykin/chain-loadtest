@@ -75,5 +75,5 @@ async.waterfall([
         chainMap: map
     };
 
-    fs.writeFileSync(`./data/${name}.json`, JSON.stringify(data, null, 2));
+    fs.writeFileSync(`./aura-loadtest-results/data/${name}.json`, JSON.stringify(data, null, 2));
 });

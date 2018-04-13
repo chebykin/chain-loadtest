@@ -8,4 +8,4 @@ config.json
 agent/agent
 remote
 build
-data
+aura-loadtest-results
