@@ -117,7 +117,7 @@ function fetchIPs() {
                 fs.writeFileSync("./tmp/latest/hostsMap.json", JSON.stringify({
                     peers,
                     validators
-                }), null, 2);
+                }, null, 2));
                 console.log('Generating hosts.txt done');
             })
             .catch(reject)
