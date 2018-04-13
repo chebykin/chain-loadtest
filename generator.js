@@ -20,6 +20,7 @@ let renderData = {
     name,
     digitalocean: data.do,
     hardware: data.hardware,
+    chainMap: data.chainMap,
     runs: []
 };
 

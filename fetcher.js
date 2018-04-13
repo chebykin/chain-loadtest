@@ -58,6 +58,12 @@ async.waterfall([
         }
     }
 
+    let map = {};
+
+    [...hostsMap.validators, ...hostsMap.peers].forEach(v => {
+        map[v.name] = v;
+    });
+
     let data = {
         blocks,
         do: {
@@ -66,7 +72,7 @@ async.waterfall([
             image: allConfig.do_image_id
         },
         hardware: Object.keys(cpusYaml).sort().reduce((r, k) => (r[k] = cpusYaml[k], r), {}),
-        chainMap: hostsMap
+        chainMap: map
     };
 
     fs.writeFileSync(`./data/${name}.json`, JSON.stringify(data, null, 2));

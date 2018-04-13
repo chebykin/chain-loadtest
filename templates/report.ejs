@@ -63,6 +63,7 @@
                 <% Object.keys(hardware).forEach(function(k) { %>
                 <tr>
                     <td><%= k %></td>
+                    <td><%= chainMap[k].region %></td>
                     <td><%= hardware[k] %></td>
                 </tr>
                 <% }) %>
