@@ -9,3 +9,4 @@ agent/agent
 remote
 build
 aura-loadtest-results
+bootnodes.txt
