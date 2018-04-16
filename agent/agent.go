@@ -115,9 +115,9 @@ func server() {
 	srv := &http.Server{
 		Handler:      r,
 		Addr:         addr,
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  100 * time.Second,
-		IdleTimeout:  100 * time.Second,
+		WriteTimeout: 60 * time.Second,
+		ReadTimeout:  200 * time.Second,
+		IdleTimeout:  200 * time.Second,
 	}
 
 	log.Println("Listening at", addr)
