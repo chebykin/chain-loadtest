@@ -18,7 +18,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cactus/go-statsd-client/statsd"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -33,7 +32,9 @@ import (
 
 var config *Configuration
 var chainMap *ChainMap
-var statsdClient statsd.Statter
+
+// TOOD: bring it back or replace
+// var statsdClient statsd.Statter
 var pubnub *messaging.Pubnub
 
 const (
@@ -91,14 +92,14 @@ func main() {
 	}
 	log.Println("coinbase", coinbase)
 
-	statsdClient, err = statsd.NewClient("127.0.0.1:8125", config.Me.Name)
-	if err != nil {
-		log.Panicln("Failed to connect statsd server:", err)
-	}
+	// statsdClient, err = statsd.NewClient("127.0.0.1:8125", config.Me.Name)
+	// if err != nil {
+	// 	log.Panicln("Failed to connect statsd server:", err)
+	// }
 
 	pubnub = messaging.NewPubnub(pnPubKey, pnSubKey, "", "", false, "", nil)
 
-	defer statsdClient.Close()
+	// defer statsdClient.Close()
 
 	server()
 }
@@ -114,9 +115,9 @@ func server() {
 	srv := &http.Server{
 		Handler:      r,
 		Addr:         addr,
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  100 * time.Second,
-		IdleTimeout:  100 * time.Second,
+		WriteTimeout: 60 * time.Second,
+		ReadTimeout:  200 * time.Second,
+		IdleTimeout:  200 * time.Second,
 	}
 
 	log.Println("Listening at", addr)
@@ -231,10 +232,10 @@ func personalHandler(worker Worker, w http.ResponseWriter, r *http.Request) {
 			select {
 			case result := <-resultsCh:
 				log.Println("<<<", result)
-				statsdClient.Inc("txsend", 1, 1.0)
+				// statsdClient.Inc("txsend", 1, 1.0)
 
 				if result.Error {
-					statsdClient.Inc("txerr", 1, 1.0)
+					// statsdClient.Inc("txerr", 1, 1.0)
 				}
 				// TODO: push info to statsd
 				results[i] = result
@@ -382,11 +383,11 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 			select {
 			case result := <-resultsCh:
 				log.Println("<<<", result)
-				statsdClient.Inc("txsend", 1, 1.0)
+				// statsdClient.Inc("txsend", 1, 1.0)
 
-				if result.Error {
-					statsdClient.Inc("txerr", 1, 1.0)
-				}
+				// if result.Error {
+				// 	statsdClient.Inc("txerr", 1, 1.0)
+				// }
 				// TODO: push info to statsd
 				results[i] = result
 			case <-r.Context().Done():
