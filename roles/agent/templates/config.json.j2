@@ -2,11 +2,7 @@
   "me": {
     "name": "{{ name }}",
     "address": "0x{{ address.stdout }}",
-{% if type == 'validator' %}
-    "password": "vpeers/{{ name }}"
-{% else %}
     "password": "{{ name }}"
-{% endif %}
   },
   "endpoints": {
     "rpc": "127.0.0.1:8545",

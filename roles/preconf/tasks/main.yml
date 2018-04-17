@@ -14,36 +14,26 @@
   delegate_to: localhost
 
 - name: Upgrade packages
+  become: true
   apt:
     upgrade: yes
     update_cache: yes
     cache_valid_time: 3600
 
 - name: Install ntpdate
+  become: true
   apt:
     name:
       - ntpdate
 
+- name: Stop NTP server
+  become: true
+  service: name=ntp state=stopped
+
 - name: Sync time with ntp server
+  become: true
   shell: "ntpdate 0.nl.pool.ntp.org"
 
-- name: Create new user
-  user:
-    name: ubuntu
-    shell: /bin/bash
-
-- name: Create .ssh folder
-  file:
-    path: ~ubuntu/.ssh
-    state: directory
-    owner: ubuntu
-    group: ubuntu
-    mode: 0700
-
-- name: Upload SSH key
-  copy:
-    src: ~/.ssh/do.pub
-    dest: ~ubuntu/.ssh/authorized_keys
-    owner: ubuntu
-    group: ubuntu
-    mode: 0700
+- name: Start NTP server
+  become: true
+  service: name=ntp state=started

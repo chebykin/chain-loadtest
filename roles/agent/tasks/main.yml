@@ -9,7 +9,7 @@
 
 - name: Copy chain map
   copy:
-    src: "./tmp/{{ timestamp }}/map.json"
+    src: "./map.json"
     dest: "{{ home }}/map.json"
     owner: "{{ username }}"
     group: "{{ username }}"
@@ -21,6 +21,7 @@
 
 - name: Fetch address from key file
   shell: "grep -oP '(?<=\"address\":\")[^\"]*' {{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/peer.key"
+  when: inventory_hostname in groups['peer']
   register: address
 
 - name: Copy config json
@@ -32,7 +33,9 @@
     mode: 0644
 
 - name: install poa-agent service
+  become: true
   template: src=poa-agent.service.j2 dest=/etc/systemd/system/poa-agent.service owner=root group=root mode=0755
 
 - name: ensure poa-agemt is running and enabled to start at boot
+  become: true
   service: name=poa-agent.service state=restarted enabled=yes daemon_reload=yes
