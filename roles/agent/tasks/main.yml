@@ -9,8 +9,8 @@
 
 - name: Copy chain map
   copy:
-    src: "./map.json"
-    dest: "{{ home }}/map.json"
+    src: "./tmp/latest/map.yml"
+    dest: "{{ home }}/map.yml"
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: 0644
