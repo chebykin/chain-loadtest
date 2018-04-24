@@ -16,10 +16,6 @@ if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
 }
 
-if (!fs.existsSync(`${dir}/vpeers`)) {
-    fs.mkdirSync(`${dir}/vpeers`);
-}
-
 function generate(name) {
     let dk = keythereum.create({keyBytes: 32, ivBytes: 16});
 
@@ -40,7 +36,6 @@ console.log('Generating validator accounts....');
 
 for (let i = 0; i < validatorsCount; i++) {
     validators.push(generate(`validator-${i}`));
-    peers.push(generate(`vpeers/validator-${i}`));
 }
 
 console.log('Generating master account ....');
@@ -60,18 +55,6 @@ for (let i = 0; i < peers.length; i++) {
 }
 
 fs.writeFileSync(`${dir}/spec.json`, JSON.stringify(chainSpec, null, 2));
-
-console.log('Generating chain map...');
-
-let chainMap = {
-    master,
-    validators,
-    peers,
-};
-
-fs.writeFileSync(`${dir}/map.json`, JSON.stringify(chainMap, null, 2));
-
-console.log('Copying Parity configs...');
 
 fs.createReadStream('./templates/local.toml').pipe(fs.createWriteStream(`./tmp/${time}/local.toml`));
 
