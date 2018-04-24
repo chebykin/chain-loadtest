@@ -25,7 +25,6 @@
   remote_user: ubuntu
   roles:
     - parity
-#    - monitoring
 
 - name: Configure agent
   hosts: peer
