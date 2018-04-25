@@ -1,10 +1,10 @@
 provider: gcloud
-peers_count: 4
-validators_count: 3
-timestamp: 1523965671717
-map: local
+timestamp: 1524592738817
+map: gcloud-local
 home: /home/ubuntu
 username: ubuntu
 genesis_network_name: PoaLoadTest
 agent_secret: check
 parity_deb: 'http://d1h4xl4cr1h0mo.cloudfront.net/v1.9.7/x86_64-unknown-linux-gnu/parity_1.9.7_ubuntu_amd64.deb'
+influx_user: pusher
+influx_pass: pusher_pass
