@@ -11,15 +11,9 @@ const secret = allConfig.agent_secret;
 let peers = [];
 
 let peerKeys = Object.keys(hostsFile.peer || {});
-let validatorKeys = Object.keys(hostsFile.validator || {});
 
 for (let i = 0; i < peerKeys.length; i++) {
     let s = peerKeys[i];
-    peers.push(s.substring(0, s.length - 5))
-}
-
-for (let i = 0; i < validatorKeys.length; i++) {
-    let s = validatorKeys[i];
     peers.push(s.substring(0, s.length - 5))
 }
 

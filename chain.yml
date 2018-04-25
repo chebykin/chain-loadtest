@@ -1,7 +1,7 @@
 - name: Configure ubuntu
   hosts: all
   gather_facts: no
-  remote_user: root
+  remote_user: ubuntu
   roles:
     - preconf
 
@@ -22,14 +22,13 @@
 - name: Configure ubuntu
   hosts: all
   gather_facts: no
-  remote_user: root
+  remote_user: ubuntu
   roles:
     - parity
-#    - monitoring
 
 - name: Configure agent
-  hosts: all
+  hosts: peer
   gather_facts: no
-  remote_user: root
+  remote_user: ubuntu
   roles:
     - agent

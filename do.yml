@@ -1,0 +1,25 @@
+# Pre-seed DO instance to look like AWS and GCloud
+- name: Configure ubuntu
+  hosts: all
+  gather_facts: no
+  remote_user: root
+  - name: Create new user
+    user:
+      name: ubuntu
+      shell: /bin/bash
+
+  - name: Create .ssh folder
+    file:
+      path: ~ubuntu/.ssh
+      state: directory
+      owner: ubuntu
+      group: ubuntu
+      mode: 0700
+
+  - name: Upload SSH key
+    copy:
+      src: ~/.ssh/do.pub
+      dest: ~ubuntu/.ssh/authorized_keys
+      owner: ubuntu
+      group: ubuntu
+      mode: 0700

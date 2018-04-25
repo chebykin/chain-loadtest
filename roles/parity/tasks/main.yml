@@ -1,12 +1,15 @@
 ---
 - name: Install parity
+  become: true
   apt:
     deb: "{{ parity_deb }}"
 
 - name: install parity service
+  become: true
   template: src=parity.service.j2 dest=/etc/systemd/system/parity.service owner=root group=root mode=0755
 
 - name: ensure parity is running and enabled to start at boot
+  become: true
   service: name=parity.service state=started enabled=yes
 
 - name: Sleep for 30 seconds until enode uppear in logs
@@ -39,4 +42,5 @@
     mode: 0644
 
 - name: Restart parity
+  become: true
   service: name=parity.service state=restarted

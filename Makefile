@@ -1,20 +1,19 @@
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-play-do:
-	ansible-playbook createDoNodes.yml
+# The commands are aligned according workflow
+generate:
+	node generator.js
 
-play-chain:
+create:
+	python providers/create.py
+
+fetch:
+	python providers/fetch_metadata.py
+
+chain:
 	ansible-playbook -i hosts.txt chain.yml
 
-play-checks:
-	ansible-playbook -i hosts.txt tx-checks.yml
-
-generate-keys:
-	node app.js
-
-seed-nodes:
-	ansible-playbook -i hosts.txt validator.yml
-
+# Agent related
 agent-clean:
 	rm -f agent/agent
 
@@ -30,17 +29,14 @@ agent-deploy:
 
 agent-update: agent-clean agent-linux agent-deploy
 
+# The rest of commands
 tx-queue:
 	cd txqueue && node server.js
 
-configs:
-	node app.js
-	node elMap.js
+gcloud-options:
+	gcloud compute regions list
+	gcloud compute images list
+	gcloud compute machine-types list --filter="zone:europe-west3-a"
 
-droplets:
-	node createDoNodes.js
-
-chain:
-	ansible-playbook -i hosts.txt chain.yml
-
-bootstrap-network: configs droplets chain
+create-do:
+	ansible-playbook createDoNodes.yml

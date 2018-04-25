@@ -18,6 +18,8 @@ import (
 	"sync"
 	"time"
 
+	yaml "gopkg.in/yaml.v2"
+
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -73,12 +75,12 @@ func main() {
 	}()
 
 	// Reading chain map
-	file, err = ioutil.ReadFile("./map.json")
+	file, err = ioutil.ReadFile("./map.yml")
 	if err != nil {
 		log.Panicln("Unable to read chain map file:", err)
 	}
 
-	err = json.Unmarshal(file, &chainMap)
+	err = yaml.Unmarshal(file, &chainMap)
 	if err != nil {
 		log.Panicln("Unable to parse chain map file:", err)
 	}
@@ -253,10 +255,14 @@ func personalHandler(worker Worker, w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Scheduling jobs...")
+	keys := make([]string, len(chainMap.Peers))
+	for k := range chainMap.Peers {
+		keys = append(keys, k)
+	}
 	for i := 0; i < count; i++ {
 		jobsCh <- sendOpts{
 			Val:       val,
-			Addressee: chainMap.Peers[j],
+			Addressee: chainMap.Peers[keys[j]].AgentAddress,
 		}
 
 		log.Printf("Job #%d scheduled\n", i)
@@ -366,10 +372,14 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 	txs := make(types.Transactions, count)
 	signer := types.NewEIP155Signer(big.NewInt(int64(15054)))
 
+	keys := make([]string, len(chainMap.Peers))
+	for k := range chainMap.Peers {
+		keys = append(keys, k)
+	}
 	for i := 0; i < count; i++ {
 		payload := make([]byte, 200)
 		rand.Read(payload)
-		tx := types.NewTransaction(nonce, common.BytesToAddress([]byte(chainMap.Peers[0])),
+		tx := types.NewTransaction(nonce, common.BytesToAddress([]byte(chainMap.Peers[keys[0]].AgentAddress)),
 			big.NewInt(1E16),
 			uint64(50*1000*1000), big.NewInt(1E9), payload)
 
@@ -594,10 +604,19 @@ func (s *sendResult) String() string {
 	return s.Msg
 }
 
+type Peer struct {
+	Name         string
+	AgentAddress string `json:"agent_address"`
+}
+
+type Validator struct {
+	Name string
+}
+
 type ChainMap struct {
 	Master     string
-	Peers      []string
-	Validators []string
+	Peers      map[string]Peer
+	Validators map[string]Validator
 }
 
 type Configuration struct {

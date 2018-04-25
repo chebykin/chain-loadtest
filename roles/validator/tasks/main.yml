@@ -15,14 +15,6 @@
     group: "{{ username }}"
     mode: 0644
 
-- name: Copy peer key file
-  copy:
-    src: "./tmp/{{ timestamp }}/vpeers/{{ name }}.json"
-    dest: "{{ home }}/.local/share/io.parity.ethereum/keys/{{ genesis_network_name }}/peer.key"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    mode: 0644
-
 - name: Fetch core count
   shell: "cat /proc/cpuinfo | grep processor | wc -l"
   register: core_count

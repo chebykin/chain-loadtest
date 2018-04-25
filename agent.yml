@@ -1,6 +1,6 @@
 - name: Configure agent
-  hosts: all
+  hosts: peer
   gather_facts: no
-  remote_user: root
+  remote_user: ubuntu
   roles:
     - agent
