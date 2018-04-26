@@ -2,14 +2,17 @@
 - name: 'Install python2'
   raw: sudo apt-get -y install python-simplejson
 
+- name: 'Install scripts dependencies'
+  raw: curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && sudo python ./get-pip.py && sudo pip install py-cpuinfo
+
 - name: Collect CPU info
-  shell: "lscpu | sed -nr '/Model name/ s/.*:\\s*(.* @ .*)/\\1/p'"
+  script: "./providers/fetch_cpu_info.py {{name}}"
   register: cpu_info
 
 - name: Write CPU info
   lineinfile:
-    path: ./tmp/latest/cpuinfo.txt
-    line: "{{ name }}: {{ cpu_info.stdout }}"
+    path: ./tmp/latest/cpu_map.yml
+    line: "{{ cpu_info.stdout }}"
     create: yes
   delegate_to: localhost
 
@@ -24,7 +27,7 @@
   become: true
   apt:
     name:
-      - ntpdate
+      - ntp
 
 - name: Stop NTP server
   become: true
