@@ -30,7 +30,7 @@
   become: true
   apt:
     name:
-      - ntp
+      - ntpdate
 
 - name: Stop NTP server
   become: true
