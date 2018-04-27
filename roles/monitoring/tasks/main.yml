@@ -1,32 +1,18 @@
 ---
-- name: Install collectd
+- name: Install telegraf
+  become: True
   apt:
-    name:
-      - collectd
-      - collectd-utils
+    deb: https://dl.influxdata.com/telegraf/releases/telegraf_1.6.1-1_amd64.deb
 
-- name: Install statsd
-  apt:
-    deb: https://kenig-public.ams3.digitaloceanspaces.com/statsd_0.8.0-1_all.deb
-
-- name: Configure collectd
+- name: Configure telegraf
+  become: True
   template:
-    src: "collectd.conf"
-    dest: /etc/collectd/collectd.conf
-    owner: root
-    group: root
-    mode: 0644
-
-- name: Configure statsd
-  template:
-    src: "localConfig.js"
-    dest: /etc/statsd/localConfig.js
+    src: "telegraf.conf"
+    dest: /etc/telegraf/telegraf.conf
     owner: root
     group: root
     mode: 0644
 
 - name: Restart statsd
-  service: name=collectd state=restarted
-
-- name: Restarting statsd
-  service: name=statsd state=restarted
+  become: True
+  service: name=telegraf state=restarted
