@@ -3,23 +3,13 @@ chain = "{{ home }}/spec.json"
 no_persistent_txqueue = true
 
 [rpc]
-disable = false
-interface = "0.0.0.0"
-apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
-processing_threads = {{ core_count.stdout | int }}
-cors=["all"]
+disable = true
 
 [websockets]
-disable = false
-interface = "0.0.0.0"
-hosts = ["all"]
-origins = ["all"]
-apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
+disable = true
 
 [ipc]
-disable = false
-apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
-path = "/tmp/parity.ipc"
+disable = true
 
 [ui]
 disable = true

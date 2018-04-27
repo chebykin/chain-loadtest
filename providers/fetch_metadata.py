@@ -3,6 +3,7 @@ import json
 import os
 
 from dotenv import load_dotenv
+from enum import Enum
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 
@@ -17,9 +18,19 @@ driver = ComputeEngine(os.getenv('GCE_SERVICE_ACCOUNT'),
 
 peers = {}
 validators = {}
+observers = {}
+
+
+class NodeType(Enum):
+    OBSERVER = 1
+    VALIDATOR = 2
+    PEER = 3
+
+
 map = {
     'validators': {},
-    'peers': {}
+    'peers': {},
+    'observers': {}
 }
 
 nodes = driver.list_nodes()
@@ -30,7 +41,7 @@ def provider_name(original):
         return 'gcloud'
 
 
-def cook_value(fetched_v, is_validator):
+def cook_value(fetched_v, node_type):
     addresses = get_addresses()
 
     map_v = {
@@ -42,9 +53,9 @@ def cook_value(fetched_v, is_validator):
         'size': fetched_v.size
     }
 
-    if is_validator:
+    if node_type is NodeType.VALIDATOR:
         map_v['engine_signer_address'] = addresses[fetched_v.name]
-    else:
+    elif node_type is NodeType.PEER:
         map_v['agent_address'] = addresses[fetched_v.name]
 
     return map_v
@@ -67,9 +78,17 @@ for node in nodes:
         peers[node.name] = node
     elif node.name.startswith('validator'):
         validators[node.name] = node
+    elif node.name.startswith('observer'):
+        observers[node.name] = node
 
 # writing hosts.txt
 with open('hosts.txt', 'w') as hosts:
+    hosts.write('[observer]\n')
+    for observer in observers.values():
+        hosts.write('{:s} name={:s} type=observer\n'
+                    .format(observer.public_ips[0], observer.name))
+    hosts.write('\n')
+
     hosts.write('[peer]\n')
     for peer in peers.values():
         hosts.write('{:s} name={:s} type=peer\n'
@@ -85,10 +104,13 @@ with open('hosts.txt', 'w') as hosts:
 
 # writing map.json
 for fetched_v in validators.values():
-    map['validators'][fetched_v.name] = cook_value(fetched_v, True)
+    map['validators'][fetched_v.name] = cook_value(fetched_v, NodeType.VALIDATOR)
 
 for fetched_v in peers.values():
-    map['peers'][fetched_v.name] = cook_value(fetched_v, False)
+    map['peers'][fetched_v.name] = cook_value(fetched_v, NodeType.PEER)
+
+for fetched_v in observers.values():
+    map['observers'][fetched_v.name] = cook_value(fetched_v, NodeType.OBSERVER)
 
 with open('tmp/latest/map.yml', 'w') as outfile:
     yaml.dump(map, outfile, default_flow_style=False)

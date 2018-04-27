@@ -32,14 +32,18 @@ replace it with `ubuntu@Vitaliks-MacBook-Pro.local`.
 ##### Setup Firewall rules
 
 * Go to `VPC Network` -> `Firewall rules`
-* Add a rule with:
+* Add peer rule:
 ** Name: peer
 ** Target tags: peer-node
-** Protocols/ports: tcp:8080,8545,8546,30303; udp:30301
-* Add another rule:
+** Protocols/ports: tcp:30303; udp:30301
+* Add validator rule:
 ** Name: validator
 ** Target tags: validator-node
-** Protocols/ports: tcp:8545,8546,30303; udp:30301
+** Protocols/ports: tcp:30303; udp:30301
+* Add observer rule:
+** Name: observer
+** Target tags: observer-node
+** Protocols/ports: tcp:8080,8545,8546,30303; udp:30301
 
 ### Fill required values in `group_vars/all`
 ** provider - [gcloud, aws, do]

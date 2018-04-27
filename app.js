@@ -6,8 +6,20 @@ const time = new Date().getTime();
 const dir = `./tmp/${time}`;
 
 const allConfig = YAML.load("./group_vars/all.yml");
-const peersCount = allConfig['peers_count'];
-const validatorsCount = allConfig['validators_count'];
+const chainMap = YAML.load(`./maps/${allConfig['map']}.yml`);
+let peersCount = 0;
+let validatorsCount = 0;
+
+(function () {
+
+    Object.keys(chainMap).forEach((key) => {
+        if (key.startsWith("peer-")) {
+            peersCount++;
+        } else if (key.startsWith("validator-")) {
+            validatorsCount++;
+        }
+    })
+})();
 
 let peers = [];
 let validators = [];

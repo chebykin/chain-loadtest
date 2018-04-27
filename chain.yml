@@ -19,6 +19,13 @@
   roles:
     - peer
 
+- name: Configure observer
+  hosts: observer
+  gather_facts: yes
+  remote_user: ubuntu
+  roles:
+    - observer
+
 - name: Configure ubuntu
   hosts: all
   gather_facts: no

@@ -72,33 +72,30 @@ provider = chainMap['defaults']['provider']
 
 peer_tags = ['peer-node', 'tn-{:d}'.format(allConfig['timestamp'])]
 validator_tags = ['validator-node', 'tn-{:d}'.format(allConfig['timestamp'])]
+observer_tags = ['observer-node', 'tn-{:d}'.format(allConfig['timestamp'])]
 
 print(chainMap)
 
 for key, val in chainMap.items():
     if key.startswith('peer-'):
-        peer = CreateNodeConfig(
-            name=key,
-            provider=provider,
-            size=size,
-            image=image,
-            location=location,
-            tags=peer_tags
-        )
-
-        instances.append(peer)
-
+        tags = peer_tags
     elif key.startswith('validator-'):
-        validator = CreateNodeConfig(
-            name=key,
-            provider=provider,
-            size=size,
-            image=image,
-            location=location,
-            tags=validator_tags
-        )
+        tags = validator_tags
+    elif key.startswith('observer-'):
+        tags = observer_tags
+    else:
+        continue
 
-        instances.append(validator)
+    instance = CreateNodeConfig(
+        name=key,
+        provider=provider,
+        size=size,
+        image=image,
+        location=location,
+        tags=tags
+    )
+
+    instances.append(instance)
 
 pp.pprint(instances)
 
