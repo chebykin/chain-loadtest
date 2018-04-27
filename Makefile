@@ -1,17 +1,19 @@
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 # The commands are aligned according workflow
-generate:
-	node generator.js
+configs:
+	node app.js
 
-create:
-	python providers/create.py
+instances:
+	python3 providers/create.py
 
 fetch:
-	python providers/fetch_metadata.py
+	python3 providers/fetch_metadata.py
 
 chain:
 	ansible-playbook -i hosts.txt chain.yml
+
+bootstrap: configs instances fetch chain
 
 # Agent related
 agent-clean:
