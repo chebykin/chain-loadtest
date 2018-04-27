@@ -5,9 +5,6 @@
 - name: 'Install scripts dependencies'
   raw: curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && sudo python ./get-pip.py && sudo pip install py-cpuinfo
 
-- name: 'Copy fetch_cpu_info.py script'
-  copy: dest=/home/ubuntu/ src=fetch_cpu_info.py owner=ubuntu group=ubuntu mode=755
-
 - name: Collect CPU info
   script: "./fetch_cpu_info.py {{name}}"
   register: cpu_info
