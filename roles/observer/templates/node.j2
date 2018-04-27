@@ -3,15 +3,14 @@ chain = "{{ home }}/spec.json"
 no_persistent_txqueue = true
 
 [rpc]
-disable = false
-interface = "127.0.0.1"
+interface = "0.0.0.0"
 apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc"]
 processing_threads = {{ core_count.stdout | int }}
 cors=["all"]
 
 [websockets]
 disable = false
-interface = "127.0.0.1"
+interface = "0.0.0.0"
 hosts = ["all"]
 origins = ["all"]
 apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc", "pubsub"]
@@ -22,15 +21,12 @@ apis = ["web3", "eth", "parity", "parity_set", "personal", "net", "traces", "rpc
 path = "/tmp/parity.ipc"
 
 [ui]
-disable = true
+disable = false
+interface = "0.0.0.0"
 
 [network]
 reserved_peers = "{{ home }}/bootnodes.txt"
 discovery = false
-
-[account]
-password = ["{{ home }}/node.pwd"]
-unlock = ["0x{{ account.stdout }}"]
 
 [mining]
 reseal_on_txs = "none"

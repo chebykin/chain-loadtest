@@ -1,11 +1,12 @@
 defaults:
   provider: gcloud
   location: europe-west2-a
-  size: n1-highcpu-2
+  size: g1-small
   image: ubuntu-1604
   gcloud:
     projectId: 704122475665
 
+observer-0:
 validator-0:
 validator-1:
 peer-0:
