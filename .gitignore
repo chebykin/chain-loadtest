@@ -10,3 +10,4 @@ remote
 build
 aura-loadtest-results
 bootnodes.txt
+group_vars/all.yml
