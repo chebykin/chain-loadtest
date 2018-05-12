@@ -44,8 +44,9 @@
 
 - name: Parity
   hosts: all
+  become: true
   gather_facts: no
-  remote_user: root
+  remote_user: ubuntu
   tasks:
     - name: Restart parity
       service: name=parity.service state=restarted
