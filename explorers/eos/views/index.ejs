@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+          integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <h1>blocks</h1>
+    </div>
+    <div class="row">
+        <table class="col-xs-12 table table-striped table-sm">
+            <tr>
+                <th>#id</th>
+                <th>tx count</th>
+                <th>producer</th>
+                <th>timestamp</th>
+            </tr>
+            <% blocks.forEach(function(block) { %>
+            <tr>
+                <td><%= block.block_num %></td>
+                <td><%= block.transactions.length %></td>
+                <td><%= block.producer %></td>
+                <td><%= block.timestamp%></td>
+            </tr>
+            <% }); %>
+        </table>
+    </div>
+</div>
+</body>
+</html>
