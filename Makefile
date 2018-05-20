@@ -10,8 +10,11 @@ instances:
 fetch:
 	python3 providers/fetch_metadata.py
 
-chain:
-	ansible-playbook -i hosts.txt chain.yml
+chain-aura:
+	ansible-playbook -i hosts.txt chain-aura.yml
+
+chain-aura:
+	ansible-playbook -i hosts.txt chain-eos.yml
 
 bootstrap: configs instances fetch chain
 
