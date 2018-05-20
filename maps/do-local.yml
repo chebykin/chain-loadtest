@@ -1,0 +1,13 @@
+defaults:
+  provider: do
+  gcloud:
+    projectId: 704122475665
+  do:
+    key_id: 19020824
+    location: ams3
+    size: c-2
+    image: ubuntu-18-04-x64
+
+#observer-0:
+#validator-0:
+peer-0:

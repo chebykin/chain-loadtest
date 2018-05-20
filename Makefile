@@ -13,7 +13,7 @@ fetch:
 chain-aura:
 	ansible-playbook -i hosts.txt chain-aura.yml
 
-chain-aura:
+chain-eos:
 	ansible-playbook -i hosts.txt chain-eos.yml
 
 bootstrap: configs instances fetch chain

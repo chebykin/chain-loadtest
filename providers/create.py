@@ -53,32 +53,47 @@ class CreateNode(threading.Thread):
             driver = compute_engine(os.getenv('GCE_SERVICE_ACCOUNT'),
                                     os.getenv('GCE_KEY_PATH'),
                                     project=os.getenv('GCE_PROJECT_ID'))
-        else:
-            raise Exception('Provider not specified for', self.name)
+            res = driver.create_node(self.config.name,
+                                     self.config.size,
+                                     self.config.image,
+                                     location=self.config.location,
+                                     ex_tags=self.config.tags)
+        elif self.config.provider == 'do':
+            cls = get_driver(Provider.DIGITAL_OCEAN)
 
-        res = driver.create_node(self.config.name,
-                                 self.config.size,
-                                 self.config.image,
-                                 location=self.config.location,
-                                 ex_tags=self.config.tags)
+            driver = cls(os.getenv('DO_API_TOKEN'), api_version='v2')
+
+            print(chainMap['defaults']['do']['key_id'])
+            res = driver.create_node(name=self.config.name,
+                                     size=type('obj', (object,), {'name': self.config.size}),
+                                     image=type('obj', (object,), {'id': self.config.image}),
+                                     location=type('obj', (object,), {'id': self.config.location}),
+                                     ex_create_attr={
+                                         'tags': self.config.tags,
+                                         'ssh_keys': [int(chainMap['defaults']['do']['key_id'])]
+                                     })
+        else:
+            raise Exception('Provider not specified for ' + self.config.name)
+
         print(res)
 
 
 instances = []
 
-image = chainMap['defaults']['image']
 provider = chainMap['defaults']['provider']
 
 defaults = chainMap['defaults']
+image = defaults[provider]['image']
+size = defaults[provider]['size']
 
-peer_size = defaults['size']
-peer_location = defaults['location']
+peer_size = defaults[provider]['size']
+peer_location = defaults[provider]['location']
 
-validator_size = defaults['size']
-validator_location = defaults['location']
+validator_size = defaults[provider]['size']
+validator_location = defaults[provider]['location']
 
-observer_size = defaults['size']
-observer_location = defaults['location']
+observer_size = defaults[provider]['size']
+observer_location = defaults[provider]['location']
 
 if 'peers' in chainMap['defaults']:
     peer_defaults = chainMap['defaults']['peers']
