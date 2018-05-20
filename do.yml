@@ -3,9 +3,19 @@
   hosts: all
   gather_facts: no
   remote_user: root
+  tasks:
+  - name: 'Install python2'
+    raw: sudo apt-get -y install python-simplejson
+
+  - name: Ensure group "ubuntu" exists
+    group:
+      name: ubuntu
+      state: present
+
   - name: Create new user
     user:
       name: ubuntu
+      groups: sudo,ubuntu
       shell: /bin/bash
 
   - name: Create .ssh folder
