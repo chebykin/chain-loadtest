@@ -33,3 +33,8 @@
       owner: ubuntu
       group: ubuntu
       mode: 0700
+
+  - name: Allow sudo without password
+    lineinfile:
+      path: /etc/sudoers
+      line: "ubuntu ALL=(ALL) NOPASSWD: ALL"
