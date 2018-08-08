@@ -28,6 +28,7 @@
   apt:
     name:
       - ntpdate
+      - ntp
 
 - name: Stop NTP server
   become: true

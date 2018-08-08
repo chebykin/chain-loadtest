@@ -13,6 +13,6 @@
     group: root
     mode: 0644
 
-- name: Restart statsd
+- name: Restart telegraf
   become: True
   service: name=telegraf state=restarted
