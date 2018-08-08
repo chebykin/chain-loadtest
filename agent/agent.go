@@ -25,6 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/rlp"
 	ethrpc "github.com/ethereum/go-ethereum/rpc"
 	"github.com/gorilla/mux"
 	"github.com/pubnub/go/messaging"
@@ -343,11 +344,6 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 	defer close(jobsCh)
 	defer close(resultsCh)
 
-	results := make([]sendResult, count)
-
-	var wg sync.WaitGroup
-	wg.Add(count)
-
 	file, err := ioutil.ReadFile(config.PeerKey)
 	if err != nil {
 		log.Panicln("Unable to read validator key file:", err)
@@ -368,13 +364,24 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 		log.Panic(err)
 	}
 
-	txs := make(types.Transactions, count)
+	// txs := make(types.Transactions, count)
 	signer := types.NewEIP155Signer(big.NewInt(int64(15054)))
 
 	keys := make([]string, len(chainMap.Peers))
 	for k := range chainMap.Peers {
 		keys = append(keys, k)
 	}
+
+	chunkSize := count / config.WorkersCount
+	jobs := make([]types.Transactions, config.WorkersCount)
+	jobIterator := 0
+	txIterator := 0
+	jobs[jobIterator] = make(types.Transactions, chunkSize)
+
+	var wg sync.WaitGroup
+	wg.Add(config.WorkersCount)
+
+	// Doing this synchronously is important to keep logic simple
 	for i := 0; i < count; i++ {
 		payload := make([]byte, 200)
 		rand.Read(payload)
@@ -383,21 +390,23 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 			uint64(50*1000*1000), big.NewInt(1E9), payload)
 
 		signed_tx, _ := types.SignTx(tx, signer, key.PrivateKey)
-		txs[i] = signed_tx
+
+		jobs[jobIterator][txIterator] = signed_tx
 		nonce++
+
+		txIterator++
+
+		if jobIterator < config.WorkersCount-1 && txIterator == chunkSize {
+			jobIterator++
+			jobs[jobIterator] = make(types.Transactions, chunkSize)
+			txIterator = 0
+		}
 	}
 
 	go func() {
-		for i := 0; i < count; i++ {
+		for i := 0; i < len(jobs); i++ {
 			select {
-			case result := <-resultsCh:
-				log.Println("<<<", result)
-				statsdClient.Inc("txsend", 1, 1.0)
-
-				if result.Error {
-					statsdClient.Inc("txerr", 1, 1.0)
-				}
-				results[i] = result
+			case <-resultsCh:
 			case <-r.Context().Done():
 				log.Printf("Request cancelled. Skipping result for #%d\n", i)
 				// nothing
@@ -409,35 +418,15 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 	msgs := make(chan counterMessage, 100*1000)
 	go counter(r.Context(), msgs)
 
-	log.Println("Launching", config.WorkersCount, "workers...")
+	log.Println("Launching", config.WorkersCount, "workers, chink size", chunkSize, "...")
 	for w := 0; w < config.WorkersCount; w++ {
-		go ethSendRawWorker(uint8(w), msgs, jobsCh, resultsCh)
+		log.Println("Job", w, "has", len(jobs[w]), "items")
+		go ethSendBatchWorker(uint8(w), jobs[w], resultsCh)
 	}
-
-	log.Println("Scheduling jobs...")
-	for i := 0; i < count; i++ {
-		jobsCh <- txs[i]
-
-		log.Printf("Job #%d scheduled\n", i)
-
-		j++
-		if j == jLimit {
-			j = 0
-		}
-
-		select {
-		case <-r.Context().Done():
-			break
-		default:
-			// do nothing
-		}
-	}
-
-	fmt.Println("Waiting for resultsCh...")
 
 	wg.Wait()
 
-	resultBytes, err := json.Marshal(results)
+	resultBytes, err := json.Marshal(struct{ Message string }{"all txs are sent"})
 	if err != nil {
 		e := errors.New(fmt.Sprintln("error occured while executing the order: ", err.Error()))
 		log.Println(e)
@@ -447,6 +436,57 @@ func ethSendRaw(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, string(resultBytes))
+}
+
+func ethSendBatchWorker(id uint8,
+	job types.Transactions, results chan<- sendResult) {
+
+	client, err := ethrpc.Dial(fmt.Sprintf("http://%s", config.Endpoints.RPC))
+	if err != nil {
+		log.Panic(err)
+	}
+
+	defer client.Close()
+	l := len(job)
+	i := 0
+
+	batch := make([]ethrpc.BatchElem, l)
+
+	for _, tx := range job {
+		if tx == nil {
+			log.Println("Tx is nil")
+			results <- sendResult{true, "Tx is nil"}
+			return
+		}
+
+		data, err := rlp.EncodeToBytes(tx)
+		if err != nil {
+			log.Println("Rlp encoding error", err.Error())
+			results <- sendResult{true, err.Error()}
+			return
+		}
+
+		batch[i] = ethrpc.BatchElem{
+			Method: "eth_sendRawTransaction",
+			Args:   []interface{}{common.ToHex(data)},
+			Result: nil,
+		}
+		i++
+	}
+
+	start := time.Now()
+	log.Println("Sending a batch request...")
+	if err := client.BatchCall(batch); err != nil {
+		log.Fatal("Error sending a batch request")
+		results <- sendResult{true, err.Error()}
+	}
+
+	defer func() {
+		elapsed := time.Since(start)
+		log.Printf("Request took %s", elapsed)
+	}()
+
+	results <- sendResult{false, "ok"}
 }
 
 func ethSendRawWorker(id uint8, countMsgs chan<- counterMessage,
