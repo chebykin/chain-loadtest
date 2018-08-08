@@ -16,7 +16,11 @@ chain-aura:
 chain-eos:
 	ansible-playbook -i hosts.txt chain-eos.yml
 
-bootstrap: configs instances fetch chain
+bootstrap: configs instances fetch chain-aura
+
+# Make DO droplet to look like AWS/GCloud
+do-prettify:
+	ansible-playbook -i hosts.txt do.yml
 
 # Agent related
 agent-clean:
